@@ -1,6 +1,6 @@
 # docker-compose-wait
 A simple script to wait for other docker images to be started while using docker-compose.
-The script permits to wait for a fixed amout of seconds or to wait until a TCP port is open on a target image.
+The script permits to wait for a fixed amount of seconds and/or to wait until a TCP port is open on a target image.
 
 # Usage
 The scripts must be used in docker build process and launched before your application starts.
@@ -49,13 +49,12 @@ services:
   mySuperApp:
     image: "mySuperApp:latest"
     hostname: mySuperApp
-    #depends_on:
-      #- "sql-server-linux"
     environment:
       WAIT_HOSTS: postgres:5432, mysql:3306, mongo:27017
 ```
 
-Now when you start docker-compose, your application will be started only when all the pairs host:port listed are available.
+Now when you start docker-compose, your application will be started only when all the pairs host:port in the WAIT_HOSTS variable are available.
+The WAIT_HOSTS environment variable is not mandatory, if not declared, the script will execute without waiting.
 
 ## More configuration options
 The behaviour of the wait.sh script can be configured with the following environment variables:
