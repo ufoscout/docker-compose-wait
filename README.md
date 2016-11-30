@@ -14,7 +14,7 @@ FROM ubuntu
 ADD MySuperApp.sh /MySuperApp.sh
 
 ## Add the wait script to the image
-ADD https://raw.githubusercontent.com/ufoscout/docker-compose-wait/master/wait.sh /wait.sh
+ADD https://raw.githubusercontent.com/ufoscout/docker-compose-wait/1.0.0/wait.sh /wait.sh
 RUN chmod +x /wait.sh
 
 ## Start the wait.sh script and then your application
