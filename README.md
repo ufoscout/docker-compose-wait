@@ -5,7 +5,7 @@ The script permits to wait for a fixed amount of seconds and/or to wait until a 
 # Usage
 The scripts must be used in docker build process and launched before your application starts.
 
-For example, suppose that your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you wnat to be sure that when it starts all other systems are available, then you can customize your dockerfile this way:
+For example, suppose that your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that when it starts all other systems are available, then you can customize your dockerfile this way:
 
 ```
 FROM ubuntu
@@ -54,13 +54,13 @@ services:
 ```
 
 Now when you start docker-compose, your application will be started only when all the pairs host:port in the WAIT_HOSTS variable are available.
-The WAIT_HOSTS environment variable is not mandatory, if not declared, the script will execute without waiting.
+The WAIT_HOSTS environment variable is not mandatory, if not declared, the script executes without waiting.
 
 ## More configuration options
 The behaviour of the wait.sh script can be configured with the following environment variables:
 - WAIT_HOSTS: comma separated list of pairs host:port for which the script will wait
 - WAIT_HOSTS_TIMEOUT: max number of seconds to wait the hosts to be available before failure. The default is 30 seconds.
-- WAIT_BEFORE_HOSTS: number of seconds to wait (sleep) before start checking the hosts availability
+- WAIT_BEFORE_HOSTS: number of seconds to wait (sleep) before start checking for the hosts availability
 - WAIT_AFTER_HOSTS: number of seconds to wait (sleep) once all the hosts are available
 
 
