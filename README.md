@@ -1,66 +1,90 @@
-# docker-compose-wait
-A simple script to wait for other docker images to be started while using docker-compose.
-The script permits to wait for a fixed amount of seconds and/or to wait until a TCP port is open on a target image.
+# docker-entrypoint
+
+An entrypoint script that can be used to wait for services to be started and or populate environment variables from a file.
+
+## Waiting For a Service to Start
+
+Wait for external services to be started before starting the Docker container. The script will wait for a fixed amount of seconds until a TCP port is open on a service.
+
+Example:
+
+```
+$ docker run --name some-mysql-client \
+  -e MYSQL_PASSWORD=password \
+  -e WAIT_HOSTS=mysql:3306 \
+  -d mysql-client:tag
+```
+
+## Docker Secrets
+
+As an alternative to passing information via environment variables, _FILE may be appended to an environment variable, entrypoint.sh will load the values for those variables from files present in the container. In particular, this can be used to load passwords from Docker secrets stored in /run/secrets/<secret_name> files.
+
+Example:
+
+```
+$ docker run --name some-mysql-client \
+  -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-root \
+  -d mysql-client:tag
+```
 
 # Usage
-The scripts must be used in docker build process and launched before your application starts.
+The script is used in the docker build process and setup as the ENTRYPOINT for the container.
 
-For example, suppose that your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that when it starts all other systems are available, then you can customize your dockerfile this way:
-
+Modify the Dockerfile file:
+## Dockerfile
 ```
 FROM ubuntu
 
 ## Add your application to the docker image
-ADD MySuperApp.sh /MySuperApp.sh
+ADD run.sh /run.sh
+RUN chmod +x /run.sh
 
-## Add the wait script to the image
-ADD https://raw.githubusercontent.com/ufoscout/docker-compose-wait/1.0.0/wait.sh /wait.sh
-RUN chmod +x /wait.sh
+## Add the entrypoint.sh script to the image
+ADD https://raw.githubusercontent.com/c7ks7s/docker-entrypoint/master/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-## Start the wait.sh script and then your application
-CMD /wait.sh && /MySuperApp.sh
+## Install netcat - required for WAIT_HOSTS in entrypoint.sh
+RUN apt-get update && \
+    apt-get install -y netcat && \
+    apt-get clean && \
+    apt-get purge && \
+    rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/run.sh"]
 ```
 
-now your image is ready.
-
-Your docker-compose.yml file will look like:
-
+Modify the docker-compose.yml file to consume secrets and wait for the mysql database:
+## docker-compose.yml
 ```
 version: "2"
 
+secrets:
+  mysql_password:
+    file: ./secrets/mysql_password
 services:
-
-  mongo:
-    image: mongo:3.4
-    hostname: mongo
-  
-  postgres:
-    image: "postgres:9.4"
-    hostname: postgres
-    ports:
-      - "5432:5432"
-
   mysql:
     image: "mysql:5.7"
-    hostname: mysql
     ports:
       - "3306:3306"
-      
-  mySuperApp:
-    image: "mySuperApp:latest"
-    hostname: mySuperApp
+  myApp:
+    image: "myApp:latest"
+    secrets:
+      - mysql_password:
     environment:
-      WAIT_HOSTS: postgres:5432, mysql:3306, mongo:27017
+      WAIT_HOSTS: mysql:3306
+      MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
 ```
 
-Now when you start docker-compose, your application will be started only when all the pairs host:port in the WAIT_HOSTS variable are available.
-The WAIT_HOSTS environment variable is not mandatory, if not declared, the script executes without waiting.
+docker-compose will start 'myApp' when all the pairs host:port in the WAIT_HOSTS variable are available and the environment variable MYSQL_PASSWORD will be populated from the docker secrets.
 
-## More configuration options
-The behaviour of the wait.sh script can be configured with the following environment variables:
+## Configuration Options:
+
+The WAIT_HOSTS and *_FILE environment variables are not mandatory, if not declared, entrypoint.sh executes the Docker Command.
+
+entrypoint.sh can be configured with the following environment variables:
 - WAIT_HOSTS: comma separated list of pairs host:port for which the script will wait
 - WAIT_HOSTS_TIMEOUT: max number of seconds to wait the hosts to be available before failure. The default is 30 seconds.
 - WAIT_BEFORE_HOSTS: number of seconds to wait (sleep) before start checking for the hosts availability
 - WAIT_AFTER_HOSTS: number of seconds to wait (sleep) once all the hosts are available
-
-
+- <ENV_VAR>_FILE: populate <ENV_VAR> from the file
