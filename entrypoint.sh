@@ -64,7 +64,7 @@ then
     [ -n "${port}" ]
     echo "Waiting for ${uri}."
     seconds=0
-    while [ "$seconds" -lt "$timeout" ] && ! timeout 1 nc -z -w1 $host $port
+    while [ "$seconds" -lt "$timeout" ] && ! timeout --preserve-status 1 nc -z -w1 $host $port 2>/dev/null
     do
       echo -n .
       seconds=$((seconds+1))
@@ -75,7 +75,8 @@ then
     then
       echo "${uri} is up!"
     else
-      echo "  ERROR: unable to connect to ${uri}" >&2
+      echo
+      echo "ERROR: unable to connect to ${uri}" 
       exit 1
     fi
   done
