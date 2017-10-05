@@ -1,0 +1,6 @@
+[package]
+name = "waiting"
+version = "0.1.0"
+authors = ["ufoscout <ufoscout@gmail.com>"]
+
+[dependencies]
