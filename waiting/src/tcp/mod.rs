@@ -1,7 +1,7 @@
 use std::io::prelude::*;
 use std::net::TcpStream;
 
-fn is_reachable(address: &String) -> bool {
+pub fn is_reachable(address: &String) -> bool {
     match TcpStream::connect(address) {
         Ok(stream) => true,
         Err(e) => false,

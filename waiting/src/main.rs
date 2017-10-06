@@ -2,20 +2,15 @@
 
 extern crate waiting;
 
-use std::time::Instant;
 use waiting::sleeper::*;
 
 fn main() {
 
-    let start = Instant::now();
-    // do stuff
-
     let sleep = waiting::sleeper::new();
-    sleep.sleep(2);
+    waiting::wait(&sleep, on_timeout);
 
-    let elapsed = start.elapsed();
-    
-    // debug format:
-    println!("{:?}", elapsed);
+}
 
+fn on_timeout() {
+    std::process::exit(1);
 }
