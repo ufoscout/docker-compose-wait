@@ -4,3 +4,6 @@ version = "0.1.0"
 authors = ["ufoscout <ufoscout@gmail.com>"]
 
 [dependencies]
+
+[dev-dependencies]
+time = "0.1"

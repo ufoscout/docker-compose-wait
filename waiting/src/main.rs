@@ -1,17 +1,16 @@
 #![feature(conservative_impl_trait)]
 
+extern crate waiting;
+
 use std::time::Instant;
-use sleeper::Sleeper;
-
-mod sleeper;
-
+use waiting::sleeper::*;
 
 fn main() {
 
     let start = Instant::now();
     // do stuff
 
-    let sleep = sleeper::new();
+    let sleep = waiting::sleeper::new();
     sleep.sleep(2);
 
     let elapsed = start.elapsed();
