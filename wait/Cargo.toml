@@ -7,3 +7,4 @@ authors = ["ufoscout <ufoscout@gmail.com>"]
 
 [dev-dependencies]
 time = "0.1"
+atomic-counter = "0.1.0"
