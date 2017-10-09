@@ -85,14 +85,7 @@ fn should_identify_the_open_port() {
     let mut fun = || { count.inc(); };
     assert_eq!(0, count.get());
 
-        thread::spawn(move || {
-                loop {
-                    match tcpListener.accept() {
-                        Ok(_) => {  println!("Connection received!"); }
-                        Err(_) => { println!("Error in received connection!"); }
-                }
-                }
-        });
+    listen_async(tcpListener);
 
     thread::sleep(time::Duration::from_millis(250));    
     wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
@@ -119,23 +112,8 @@ fn should_wait_multiple_hosts() {
     let mut fun = || { count.inc(); };
     assert_eq!(0, count.get());
 
-        thread::spawn(move || {
-                loop {
-                    match tcpListener1.accept() {
-                        Ok(_) => {  println!("Connection received!"); }
-                        Err(_) => { println!("Error in received connection!"); }
-                    }
-                }
-        });
-
-        thread::spawn(move || {
-                loop {
-                    match tcpListener2.accept() {
-                        Ok(_) => {  println!("Connection received!"); }
-                        Err(_) => { println!("Error in received connection!"); }
-                    }
-                }
-        });
+    listen_async(tcpListener1);
+    listen_async(tcpListener2);
 
     thread::sleep(time::Duration::from_millis(250));    
     wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
@@ -161,14 +139,7 @@ fn should_fail_if_not_all_hosts_are_available() {
     let mut fun = || { count.inc(); };
     assert_eq!(0, count.get());
 
-        thread::spawn(move || {
-                loop {
-                    match tcpListener1.accept() {
-                        Ok(_) => {  println!("Connection received!"); }
-                        Err(_) => { println!("Error in received connection!"); }
-                    }
-                }
-        });
+    listen_async(tcpListener1);
 
     thread::sleep(time::Duration::from_millis(250));    
     wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
@@ -194,6 +165,17 @@ fn newTcpListener() -> TcpListener {
     let loopback = Ipv4Addr::new(127, 0, 0, 1);
     let socket = SocketAddrV4::new(loopback, 0);
     TcpListener::bind(socket).unwrap()
+}
+
+fn listen_async(listener: TcpListener) {
+    thread::spawn(move || {
+            loop {
+                match listener.accept() {
+                    Ok(_) => {  println!("Connection received!"); }
+                    Err(_) => { println!("Error in received connection!"); }
+                }
+            }
+    });
 }
 
 fn free_port() -> u16 {
