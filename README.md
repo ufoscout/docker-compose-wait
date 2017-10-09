@@ -58,13 +58,14 @@ services:
 Now when you start docker-compose, your application will be started only when all the pairs host:port in the WAIT_HOSTS variable are available.
 The WAIT_HOSTS environment variable is not mandatory, if not declared, the script will execute without waiting.
 
-## More configuration options
+# More configuration options
 The behaviour of the wait utility can be configured with the following environment variables:
-- WAIT_HOSTS: comma separated list of pairs host:port for which you want to wait.
-- WAIT_HOSTS_TIMEOUT: max number of seconds to wait for the hosts to be available before failure. The default is 30 seconds.
-- WAIT_BEFORE_HOSTS: number of seconds to wait (sleep) before start checking the hosts availability
-- WAIT_AFTER_HOSTS: number of seconds to wait (sleep) once all the hosts are available
+- *WAIT_HOSTS*: comma separated list of pairs host:port for which you want to wait.
+- *WAIT_HOSTS_TIMEOUT*: max number of seconds to wait for the hosts to be available before failure. The default is 30 seconds.
+- *WAIT_BEFORE_HOSTS*: number of seconds to wait (sleep) before start checking the hosts availability
+- *WAIT_AFTER_HOSTS*: number of seconds to wait (sleep) once all the hosts are available
 
 # Notes
 This utility was explicitly written to be used with docker-compose; however, it can be used with whatever tool as it has no dependencies on docker.
+
 From version 2.0.0 this utility was rewritten from scratch in [rust](https://www.rust-lang.org), one of the consequences is that it does not require netcat or any other tool to be installed on the OS as in version 1.0.0.
