@@ -1,12 +1,12 @@
 #![feature(conservative_impl_trait)]
 
-extern crate waiting;
+extern crate wait;
 
-use waiting::sleeper::*;
+use wait::sleeper::*;
 
 fn main() {
-    let sleep = waiting::sleeper::new();
-    waiting::wait(&sleep, &waiting::config_from_env(), on_timeout);
+    let sleep = wait::sleeper::new();
+    wait::wait(&sleep, &wait::config_from_env(), on_timeout);
 }
 
 fn on_timeout() {

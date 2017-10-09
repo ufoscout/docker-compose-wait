@@ -17,7 +17,7 @@ pub struct Config {
 pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : fn()) {
 
     if (config.wait_before > 0) {
-        println!("Waiting {} seconds before checking for hosts availability", config.wait_before);
+        println!("wait {} seconds before checking for hosts availability", config.wait_before);
         sleep.sleep(config.wait_before);
     }
 
@@ -42,7 +42,7 @@ pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : fn()) {
     }
 
     if (config.wait_after > 0) {
-        println!("Waiting {} seconds after hosts availability", config.wait_after);
+        println!("wait {} seconds after hosts availability", config.wait_after);
         sleep.sleep(config.wait_after);
     }
 }

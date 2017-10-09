@@ -1,12 +1,12 @@
 #![feature(conservative_impl_trait)]
 
-extern crate waiting;
+extern crate wait;
 extern crate atomic_counter;
 
 use std::sync::atomic::AtomicUsize;
 use std::time::Instant;
 use std::net::{SocketAddrV4, Ipv4Addr, TcpListener};
-use waiting::sleeper::*;
+use wait::sleeper::*;
 use std::time::Duration;
 use std::thread;
 use atomic_counter::AtomicCounter;
@@ -17,7 +17,7 @@ fn should_wait_5_seconds_before() {
     let wait_for : u64 = 5;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    waiting::wait(&sleeper, &new_config("", 1, wait_for, 0), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, wait_for, 0), on_timeout);
     assert!( millisElapsed(start) >= wait_for )
 }
 
@@ -27,7 +27,7 @@ fn should_wait_10_seconds_after() {
     let wait_for = 10;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    waiting::wait(&sleeper, &new_config("", 1, 0, wait_for ), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, 0, wait_for ), on_timeout);
     assert!( millisElapsed(start) >= wait_for )
 }
 
@@ -36,15 +36,15 @@ fn should_wait_before_and_after() {
     let wait_for = 10;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    waiting::wait(&sleeper, &new_config("", 1, wait_for, wait_for ), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, wait_for, wait_for ), on_timeout);
     assert!( millisElapsed(start) >= (wait_for + wait_for) )
 }
 
 #[test]
-fn should_execute_without_waiting() {
+fn should_execute_without_wait() {
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    waiting::wait(&sleeper, &new_config("", 1, 0, 0 ), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, 0, 0 ), on_timeout);
     assert!( millisElapsed(start) <= 5 )
 }
 
@@ -62,7 +62,7 @@ fn should_exit_on_timeout() {
     println!("Count is {}", count.get());
 
     let fun = || { count.inc()};
-    waiting::wait(&sleeper, &new_config(hosts, timeout, 0, 0 ), callback(count));
+    wait::wait(&sleeper, &new_config(hosts, timeout, 0, 0 ), callback(count));
 
 //    check timeout should be called here
 
@@ -76,8 +76,8 @@ fn callback(a: atomic_counter::RelaxedCounter) -> Box< Fn() > {
 
 fn on_timeout() {}
 
-fn new_config(hosts: &str, timeout: u64, before: u64, after: u64) -> waiting::Config {
-    waiting::Config {
+fn new_config(hosts: &str, timeout: u64, before: u64, after: u64) -> wait::Config {
+    wait::Config {
         hosts: hosts.to_string(),
         timeout: timeout,
         wait_before: before,
