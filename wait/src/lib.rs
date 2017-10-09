@@ -1,7 +1,6 @@
 #![feature(conservative_impl_trait)]
 
 use sleeper::Sleeper;
-use std::time::Instant;
 
 pub mod env_reader;
 pub mod sleeper;
@@ -14,10 +13,10 @@ pub struct Config {
     pub wait_after : u64
 }
 
-pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : fn()) {
+pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : &mut FnMut() ) {
 
     if (config.wait_before > 0) {
-        println!("wait {} seconds before checking for hosts availability", config.wait_before);
+        println!("Waiting {} seconds before checking for hosts availability", config.wait_before);
         sleep.sleep(config.wait_before);
     }
 
@@ -42,7 +41,7 @@ pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : fn()) {
     }
 
     if (config.wait_after > 0) {
-        println!("wait {} seconds after hosts availability", config.wait_after);
+        println!("Waiting {} seconds after hosts availability", config.wait_after);
         sleep.sleep(config.wait_after);
     }
 }

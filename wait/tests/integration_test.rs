@@ -8,7 +8,7 @@ use std::time::Instant;
 use std::net::{SocketAddrV4, Ipv4Addr, TcpListener};
 use wait::sleeper::*;
 use std::time::Duration;
-use std::thread;
+use std::{thread, time};
 use atomic_counter::AtomicCounter;
 use atomic_counter::RelaxedCounter;
 
@@ -17,7 +17,7 @@ fn should_wait_5_seconds_before() {
     let wait_for : u64 = 5;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, wait_for, 0), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, wait_for, 0), &mut on_timeout);
     assert!( millisElapsed(start) >= wait_for )
 }
 
@@ -27,7 +27,7 @@ fn should_wait_10_seconds_after() {
     let wait_for = 10;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, 0, wait_for ), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, 0, wait_for ), &mut on_timeout);
     assert!( millisElapsed(start) >= wait_for )
 }
 
@@ -36,7 +36,7 @@ fn should_wait_before_and_after() {
     let wait_for = 10;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, wait_for, wait_for ), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, wait_for, wait_for ), &mut on_timeout);
     assert!( millisElapsed(start) >= (wait_for + wait_for) )
 }
 
@@ -44,34 +44,139 @@ fn should_wait_before_and_after() {
 fn should_execute_without_wait() {
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, 0, 0 ), on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, 0, 0 ), &mut on_timeout);
     assert!( millisElapsed(start) <= 5 )
 }
 
-/*
 #[test]
 fn should_exit_on_timeout() {
-    let timeout = 12;
-    let hosts = "localhost:8080";
+    let timeout = 25;
+    let wait_before = 30;
+    let wait_after = 300;
+    let hosts = "localhost:".to_string() + &free_port().to_string();
     let start = Instant::now();
     let sleeper = MillisSleeper{};
 
-    let count : atomic_counter::RelaxedCounter = atomic_counter::RelaxedCounter::new(0);
-    println!("Count is {}", count.get());
-    count.inc();
-    println!("Count is {}", count.get());
+    let mut count : atomic_counter::RelaxedCounter = atomic_counter::RelaxedCounter::new(0);
+    let mut fun = || { count.inc(); };
+    assert_eq!(0, count.get());
+    
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
+    
+    // assert that the on_timeout callback was called
+    assert_eq!(1, count.get());
 
-    let fun = || { count.inc()};
-    wait::wait(&sleeper, &new_config(hosts, timeout, 0, 0 ), callback(count));
-
-//    check timeout should be called here
-
-    assert!( start.elapsed().as_secs()  >= timeout )
+    assert!( millisElapsed(start)  >= timeout + wait_before );
+    assert!( millisElapsed(start)  < timeout + wait_after);
 }
-*/
 
-fn callback(a: atomic_counter::RelaxedCounter) -> Box< Fn() > {
-    Box::new(move || a.inc())
+#[test]
+fn should_identify_the_open_port() {
+    let timeout = 500;
+    let wait_before = 30;
+    let wait_after = 30;
+
+    let tcpListener = newTcpListener();
+    let hosts = tcpListener.local_addr().unwrap().to_string();
+    let start = Instant::now();
+    let sleeper = MillisSleeper{};
+
+    let mut count : atomic_counter::RelaxedCounter = atomic_counter::RelaxedCounter::new(0);
+    let mut fun = || { count.inc(); };
+    assert_eq!(0, count.get());
+
+        thread::spawn(move || {
+                loop {
+                    match tcpListener.accept() {
+                        Ok(_) => {  println!("Connection received!"); }
+                        Err(_) => { println!("Error in received connection!"); }
+                }
+                }
+        });
+
+    thread::sleep(time::Duration::from_millis(250));    
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
+    
+    assert_eq!(0, count.get());
+
+    assert!( millisElapsed(start)  >= wait_before + wait_after );
+    assert!( millisElapsed(start)  < timeout + wait_before + wait_after);
+}
+
+#[test]
+fn should_wait_multiple_hosts() {
+    let timeout = 500;
+    let wait_before = 30;
+    let wait_after = 30;
+
+    let tcpListener1 = newTcpListener();
+    let tcpListener2 = newTcpListener();
+    let hosts = tcpListener1.local_addr().unwrap().to_string() + "," + &tcpListener2.local_addr().unwrap().to_string();
+    let start = Instant::now();
+    let sleeper = MillisSleeper{};
+
+    let mut count : atomic_counter::RelaxedCounter = atomic_counter::RelaxedCounter::new(0);
+    let mut fun = || { count.inc(); };
+    assert_eq!(0, count.get());
+
+        thread::spawn(move || {
+                loop {
+                    match tcpListener1.accept() {
+                        Ok(_) => {  println!("Connection received!"); }
+                        Err(_) => { println!("Error in received connection!"); }
+                    }
+                }
+        });
+
+        thread::spawn(move || {
+                loop {
+                    match tcpListener2.accept() {
+                        Ok(_) => {  println!("Connection received!"); }
+                        Err(_) => { println!("Error in received connection!"); }
+                    }
+                }
+        });
+
+    thread::sleep(time::Duration::from_millis(250));    
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
+    
+    assert_eq!(0, count.get());
+
+    assert!( millisElapsed(start)  >= wait_before + wait_after );
+    assert!( millisElapsed(start)  < timeout + wait_before + wait_after);
+}
+
+#[test]
+fn should_fail_if_not_all_hosts_are_available() {
+    let timeout = 100;
+    let wait_before = 30;
+    let wait_after = 30;
+
+    let tcpListener1 = newTcpListener();
+    let hosts = tcpListener1.local_addr().unwrap().to_string() + ",127.0.0.1:" + &free_port().to_string();
+    let start = Instant::now();
+    let sleeper = MillisSleeper{};
+
+    let mut count : atomic_counter::RelaxedCounter = atomic_counter::RelaxedCounter::new(0);
+    let mut fun = || { count.inc(); };
+    assert_eq!(0, count.get());
+
+        thread::spawn(move || {
+                loop {
+                    match tcpListener1.accept() {
+                        Ok(_) => {  println!("Connection received!"); }
+                        Err(_) => { println!("Error in received connection!"); }
+                    }
+                }
+        });
+
+    thread::sleep(time::Duration::from_millis(250));    
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
+    
+    assert_eq!(1, count.get());
+
+    assert!( millisElapsed(start)  >= wait_before + wait_after );
+    assert!( millisElapsed(start)  >= timeout + wait_before + wait_after);
 }
 
 fn on_timeout() {}
@@ -91,8 +196,8 @@ fn newTcpListener() -> TcpListener {
     TcpListener::bind(socket).unwrap()
 }
 
-fn port(listener: TcpListener) -> u16 {
-    listener.local_addr().unwrap().port()
+fn free_port() -> u16 {
+    newTcpListener().local_addr().unwrap().port()
 }
 
 fn millisElapsed(start: Instant) -> u64 {

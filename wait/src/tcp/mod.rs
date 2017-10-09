@@ -1,5 +1,5 @@
-use std::io::prelude::*;
 use std::net::TcpStream;
+use std::{thread, time};
 
 pub fn is_reachable(address: &String) -> bool {
     match TcpStream::connect(address) {
@@ -19,6 +19,7 @@ mod test {
         let available_port = available_port().to_string();
         let mut address = String::from("127.0.0.1:");
         address.push_str(&available_port);
+        println!("Check for available connections on {}" , &address);
         assert!(!is_reachable(&address));
     }
 
@@ -35,12 +36,21 @@ mod test {
 
         let loopback = Ipv4Addr::new(127, 0, 0, 1);
         let socket = SocketAddrV4::new(loopback, 0);
-        let listener = TcpListener::bind(socket);
-        let listener_port = listener.unwrap().local_addr().unwrap().to_string();
+        let listener = TcpListener::bind(socket).unwrap();
+        let listener_port = listener.local_addr().unwrap().to_string();
 
-        let mut address = String::from("127.0.0.1:");
-        address.push_str(&listener_port);
-        assert!(!is_reachable(&address));
+        thread::spawn(move || {
+                loop {
+                    match listener.accept() {
+                        Ok(_) => {  println!("Connection received!"); }
+                        Err(_) => { println!("Error in received connection!"); }
+                }
+                }
+        });
+        
+        thread::sleep(time::Duration::from_millis(250));
+        println!("Check for available connections on {}", &listener_port);
+        assert!(is_reachable(&listener_port));
     }
 
 }
