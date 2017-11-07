@@ -5,10 +5,10 @@ It permits to wait for a fixed amount of seconds and/or to wait until a TCP port
 # Usage
 This utility should be used in docker build process and launched before your application starts.
 
-For example, suppose that your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that when it starts all other systems are available, then you can customize your dockerfile this way:
+For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that when it starts all other systems are available, then simply customize your dockerfile this way:
 
 ```
-FROM ubuntu
+FROM alpine
 
 ## Add your application to the docker image
 ADD MySuperApp.sh /MySuperApp.sh
@@ -21,9 +21,9 @@ RUN chmod +x /wait
 CMD /wait && /MySuperApp.sh
 ```
 
-now your image is ready.
+Done! the image is ready.
 
-Your docker-compose.yml file will look like:
+Now let's modify the docker-compose.yml file:
 
 ```
 version: "3"
@@ -55,10 +55,10 @@ services:
       WAIT_HOSTS: postgres:5432, mysql:3306, mongo:27017
 ```
 
-Now when you start docker-compose, your application will be started only when all the pairs host:port in the WAIT_HOSTS variable are available.
+When docker-compose is started (or docker stack), your application will be started only when all the pairs host:port in the WAIT_HOSTS variable are available.
 The WAIT_HOSTS environment variable is not mandatory, if not declared, the script executes without waiting.
 
-# More configuration options
+# Additional configuration options
 The behaviour of the wait utility can be configured with the following environment variables:
 - *WAIT_HOSTS*: comma separated list of pairs host:port for which you want to wait.
 - *WAIT_HOSTS_TIMEOUT*: max number of seconds to wait for the hosts to be available before failure. The default is 30 seconds.
