@@ -1,10 +1,10 @@
 [package]
 name = "wait"
-version = "0.1.0"
+version = "2.2.0"
 authors = ["ufoscout <ufoscout@gmail.com>"]
 
 [dependencies]
 
 [dev-dependencies]
-time = "0.1"
+time = "0.1.39"
 atomic-counter = "0.1.0"

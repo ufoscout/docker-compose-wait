@@ -1,8 +1,4 @@
-#![feature(conservative_impl_trait)]
-
 extern crate wait;
-
-use wait::sleeper::*;
 
 fn main() {
     let sleep = wait::sleeper::new();

@@ -1,5 +1,3 @@
-#![feature(conservative_impl_trait)]
-
 extern crate wait;
 extern crate atomic_counter;
 

@@ -16,7 +16,7 @@ impl Sleeper for SecondsSleeper {
 struct NoOpsSleeper {}
 
 impl Sleeper for NoOpsSleeper {
-    fn sleep(&self, duration: u64) {
+    fn sleep(&self, _duration: u64) {
     }
 }
 

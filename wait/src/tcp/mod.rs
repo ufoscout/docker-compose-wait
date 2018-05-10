@@ -1,10 +1,9 @@
 use std::net::TcpStream;
-use std::{thread, time};
 
 pub fn is_reachable(address: &String) -> bool {
     match TcpStream::connect(address) {
-        Ok(stream) => true,
-        Err(e) => false,
+        Ok(_stream) => true,
+        Err(_e) => false,
     }
 } // the stream is closed here
 
@@ -13,6 +12,7 @@ mod test {
 
     use std::net::{SocketAddrV4, Ipv4Addr, TcpListener};
     use super::*;
+    use std::{thread, time};
 
     #[test]
     fn port_should_be_closed() {

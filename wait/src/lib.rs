@@ -1,7 +1,3 @@
-#![feature(conservative_impl_trait)]
-
-use sleeper::Sleeper;
-
 pub mod env_reader;
 pub mod sleeper;
 pub mod tcp;
@@ -15,20 +11,20 @@ pub struct Config {
 
 pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : &mut FnMut() ) {
 
-    if (config.wait_before > 0) {
+    if config.wait_before > 0 {
         println!("Waiting {} seconds before checking for hosts availability", config.wait_before);
         sleep.sleep(config.wait_before);
     }
 
-    if (!config.hosts.trim().is_empty()) {
+    if !config.hosts.trim().is_empty() {
         let mut count = 0;
         //let start = Instant::now();
         for host in config.hosts.trim().split(',') {
             println!("Checking availability of {}", host);
-            while (!tcp::is_reachable(&host.trim().to_string())) {
-                println!("Host {} not yet availabile", host);
+            while !tcp::is_reachable(&host.trim().to_string()) {
+                println!("Host {} not yet available", host);
                 count = count + 1;
-                if (count > config.timeout) {
+                if count > config.timeout {
                 //if (start.elapsed().as_secs() > wait_timeout) {
                     println!("Timeout! After {} seconds some hosts are still not reachable", config.timeout);
                     on_timeout();
@@ -40,7 +36,7 @@ pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : &mut FnMut()
         }
     }
 
-    if (config.wait_after > 0) {
+    if config.wait_after > 0 {
         println!("Waiting {} seconds after hosts availability", config.wait_after);
         sleep.sleep(config.wait_after);
     }
@@ -58,7 +54,7 @@ pub fn config_from_env() -> Config {
 fn to_int(number: String, default : u64) -> u64 {
     match number.parse::<u64>() {
         Ok(value) => value,
-        Err(e) => default
+        Err(_e) => default
     }
 }
 
@@ -81,7 +77,7 @@ mod test {
     }
 
     #[test]
-    fn should_return_zero_when_Invalid_value() {
+    fn should_return_zero_when_invalid_value() {
         let value = to_int("hello".to_string(), 0);
         assert!(0 == value)
     }
