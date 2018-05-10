@@ -14,7 +14,7 @@ FROM alpine
 ADD MySuperApp.sh /MySuperApp.sh
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.0.0/wait /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.0/wait /wait
 RUN chmod +x /wait
 
 ## Launch the wait tool and then your application
@@ -66,6 +66,6 @@ The behaviour of the wait utility can be configured with the following environme
 - *WAIT_AFTER_HOSTS*: number of seconds to wait (sleep) once all the hosts are available
 
 # Notes
-This utility was explicitly written to be used with docker-compose; however, it can be used with whatever tool as it has no dependencies on docker.
+This utility was explicitly written to be used with docker-compose; however, it can be used everywhere since it has no dependencies on docker.
 
-From version 2.0.0 this utility was rewritten from scratch in [rust](https://www.rust-lang.org), one of the consequences is that it does not require netcat or any other tool to be installed on the OS as in version 1.0.0.
+Version 2.0.0 was rewritten from scratch in [rust](https://www.rust-lang.org). One of the positive consequences is that it does not rely on external tools (e.g netcat) as the previous versions.
