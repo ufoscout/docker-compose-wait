@@ -7,7 +7,7 @@ This utility should be used in docker build process and launched before your app
 
 For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that when it starts all other systems are available, then simply customize your dockerfile this way:
 
-```
+```dockerfile
 FROM alpine
 
 ## Add your application to the docker image
@@ -25,7 +25,7 @@ Done! the image is ready.
 
 Now let's modify the docker-compose.yml file:
 
-```
+```yml
 version: "3"
 
 services:
