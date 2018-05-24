@@ -32,7 +32,7 @@ pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : &mut FnMut()
                 }
                 sleep.sleep(1);
             }
-            println!("Host {} is now availabile", host);
+            println!("Host {} is now available", host);
         }
     }
 
