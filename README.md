@@ -14,7 +14,7 @@ FROM alpine
 ADD MySuperApp.sh /MySuperApp.sh
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.3.0/wait /wait
 RUN chmod +x /wait
 
 ## Launch the wait tool and then your application
