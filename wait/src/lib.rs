@@ -11,6 +11,14 @@ pub struct Config {
 
 pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout : &mut FnMut() ) {
 
+    println!("Docker-compose-wait starting with configuration:");
+    println!("------------------------------------------------");
+    println!(" - Hosts to be waiting for: [{}]", config.hosts);
+    println!(" - Timeout before failure: {} seconds ", config.timeout);
+    println!(" - Sleeping time before checking for hosts availability: {} seconds", config.wait_before);
+    println!(" - Sleeping time once all hosts are available: {} seconds", config.wait_after);
+    println!("------------------------------------------------");
+
     if config.wait_before > 0 {
         println!("Waiting {} seconds before checking for hosts availability", config.wait_before);
         sleep.sleep(config.wait_before);
