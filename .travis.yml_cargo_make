@@ -1,0 +1,22 @@
+language: rust
+
+sudo: true
+
+rust:
+  - stable
+  - beta
+  - nightly
+
+matrix:
+  allow_failures:
+    - rust: nightly
+
+env:
+  global:
+    - RUST_BACKTRACE=1
+    - RUSTFLAGS="-C link-dead-code"
+    - CARGO_MAKE_RUN_CODECOV="true"
+    
+script:
+  - cargo install --debug cargo-make
+  - cargo make ci-flow
