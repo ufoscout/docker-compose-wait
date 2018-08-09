@@ -1,4 +1,8 @@
 # docker-compose-wait
+
+[![Build Status](https://travis-ci.org/ufoscout/docker-compose-wait.svg?branch=master)](https://travis-ci.org/ufoscout/docker-compose-wait)
+[![codecov](https://codecov.io/gh/ufoscout/docker-compose-wait/branch/master/graph/badge.svg)](https://codecov.io/gh/ufoscout/docker-compose-wait)
+
 A small command line utility to wait for other docker images to be started while using docker-compose.
 It permits to wait for a fixed amount of seconds and/or to wait until a TCP port is open on a target image.
 
