@@ -13,7 +13,7 @@ fn should_wait_5_seconds_before() {
     let wait_for : u64 = 5;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, wait_for, 0), &mut on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, wait_for, 0, 1 ), &mut on_timeout);
     assert!( millis_elapsed(start) >= wait_for )
 }
 
@@ -23,7 +23,7 @@ fn should_wait_10_seconds_after() {
     let wait_for = 10;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, 0, wait_for ), &mut on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, 0, wait_for, 1 ), &mut on_timeout);
     assert!( millis_elapsed(start) >= wait_for )
 }
 
@@ -32,7 +32,7 @@ fn should_wait_before_and_after() {
     let wait_for = 10;
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, wait_for, wait_for ), &mut on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, wait_for, wait_for, 1 ), &mut on_timeout);
     assert!( millis_elapsed(start) >= (wait_for + wait_for) )
 }
 
@@ -40,7 +40,7 @@ fn should_wait_before_and_after() {
 fn should_execute_without_wait() {
     let start = Instant::now();
     let sleeper = MillisSleeper{};
-    wait::wait(&sleeper, &new_config("", 1, 0, 0 ), &mut on_timeout);
+    wait::wait(&sleeper, &new_config("", 1, 0, 0, 1 ), &mut on_timeout);
     assert!( millis_elapsed(start) <= 5 )
 }
 
@@ -56,9 +56,9 @@ fn should_exit_on_timeout() {
     let count : atomic_counter::RelaxedCounter = atomic_counter::RelaxedCounter::new(0);
     let mut fun = || { count.inc(); };
     assert_eq!(0, count.get());
-    
-    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
-    
+
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after, 1 ), &mut  fun);
+
     // assert that the on_timeout callback was called
     assert_eq!(1, count.get());
 
@@ -83,9 +83,9 @@ fn should_identify_the_open_port() {
 
     listen_async(tcp_listener);
 
-    thread::sleep(time::Duration::from_millis(250));    
-    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
-    
+    thread::sleep(time::Duration::from_millis(250));
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after, 1 ), &mut  fun);
+
     assert_eq!(0, count.get());
 
     assert!( millis_elapsed(start)  >= wait_before + wait_after );
@@ -111,9 +111,9 @@ fn should_wait_multiple_hosts() {
     listen_async(tcp_listener1);
     listen_async(tcp_listener2);
 
-    thread::sleep(time::Duration::from_millis(250));    
-    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
-    
+    thread::sleep(time::Duration::from_millis(250));
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after, 1 ), &mut  fun);
+
     assert_eq!(0, count.get());
 
     assert!( millis_elapsed(start)  >= wait_before + wait_after );
@@ -137,9 +137,9 @@ fn should_fail_if_not_all_hosts_are_available() {
 
     listen_async(tcp_listener1);
 
-    thread::sleep(time::Duration::from_millis(250));    
-    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after ), &mut  fun);
-    
+    thread::sleep(time::Duration::from_millis(250));
+    wait::wait(&sleeper, &new_config(&hosts, timeout, wait_before, wait_after, 1 ), &mut  fun);
+
     assert_eq!(1, count.get());
 
     assert!( millis_elapsed(start)  >= wait_before + wait_after );
@@ -148,12 +148,13 @@ fn should_fail_if_not_all_hosts_are_available() {
 
 fn on_timeout() {}
 
-fn new_config(hosts: &str, timeout: u64, before: u64, after: u64) -> wait::Config {
+fn new_config(hosts: &str, timeout: u64, before: u64, after: u64, sleep: u64) -> wait::Config {
     wait::Config {
         hosts: hosts.to_string(),
         timeout: timeout,
         wait_before: before,
         wait_after: after,
+        wait_sleep_interval: sleep
     }
 }
 
