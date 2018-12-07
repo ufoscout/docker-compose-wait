@@ -103,25 +103,25 @@ mod test {
     #[test]
     fn should_return_int_value() {
         let value = to_int("32", 0);
-        assert!(32 == value)
+        assert_eq!(32, value)
     }
 
     #[test]
     fn should_return_zero_when_negative_value() {
         let value = to_int("-32", 10);
-        assert!(10 == value)
+        assert_eq!(10, value)
     }
 
     #[test]
     fn should_return_zero_when_invalid_value() {
         let value = to_int("hello", 0);
-        assert!(0 == value)
+        assert_eq!(0, value)
     }
 
     #[test]
     fn should_return_zero_when_empty_value() {
         let value = to_int("", 11);
-        assert!(11 == value)
+        assert_eq!(11, value)
     }
 
     /*
