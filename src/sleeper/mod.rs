@@ -1,5 +1,5 @@
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 pub trait Sleeper {
     fn sleep(&self, duration: u64);
@@ -16,23 +16,22 @@ impl Sleeper for SecondsSleeper {
 struct NoOpsSleeper {}
 
 impl Sleeper for NoOpsSleeper {
-    fn sleep(&self, _duration: u64) {
-    }
+    fn sleep(&self, _duration: u64) {}
 }
 
 pub fn new() -> impl Sleeper {
-        SecondsSleeper{}
+    SecondsSleeper {}
 }
 
 pub fn new_no_ops() -> impl Sleeper {
-        NoOpsSleeper{}
+    NoOpsSleeper {}
 }
 
 #[cfg(test)]
 mod test {
 
-    use std::time::Instant;
     use super::*;
+    use std::time::Instant;
 
     #[test]
     fn should_wait_for_a_second() {
@@ -41,7 +40,7 @@ mod test {
         let start = Instant::now();
         sleeper.sleep(1);
         let elapsed_sec = start.elapsed().as_secs();
-        assert!( elapsed_sec >= 1);
+        assert!(elapsed_sec >= 1);
     }
 
     #[test]
@@ -51,6 +50,6 @@ mod test {
         let start = Instant::now();
         sleeper.sleep(10);
         let elapsed_sec = start.elapsed().as_secs();
-        assert!( elapsed_sec <= 1);
+        assert!(elapsed_sec <= 1);
     }
 }
