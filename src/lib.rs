@@ -10,7 +10,7 @@ pub struct Config {
     pub wait_sleep_interval: u64,
 }
 
-pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout: &mut FnMut()) {
+pub fn wait(sleep: &crate::sleeper::Sleeper, config: &Config, on_timeout: &mut FnMut()) {
     println!("Docker-compose-wait starting with configuration:");
     println!("------------------------------------------------");
     println!(" - Hosts to be waiting for: [{}]", config.hosts);
@@ -67,21 +67,21 @@ pub fn wait(sleep: &sleeper::Sleeper, config: &Config, on_timeout: &mut FnMut())
 
 pub fn config_from_env() -> Config {
     Config {
-        hosts: env_reader::env_var(&"WAIT_HOSTS".to_string(), "".to_string()),
+        hosts: crate::env_reader::env_var(&"WAIT_HOSTS".to_string(), "".to_string()),
         timeout: to_int(
-            &env_reader::env_var(&"WAIT_HOSTS_TIMEOUT".to_string(), "".to_string()),
+            &crate::env_reader::env_var(&"WAIT_HOSTS_TIMEOUT".to_string(), "".to_string()),
             30,
         ),
         wait_before: to_int(
-            &env_reader::env_var(&"WAIT_BEFORE_HOSTS".to_string(), "".to_string()),
+            &crate::env_reader::env_var(&"WAIT_BEFORE_HOSTS".to_string(), "".to_string()),
             0,
         ),
         wait_after: to_int(
-            &env_reader::env_var(&"WAIT_AFTER_HOSTS".to_string(), "".to_string()),
+            &crate::env_reader::env_var(&"WAIT_AFTER_HOSTS".to_string(), "".to_string()),
             0,
         ),
         wait_sleep_interval: to_int(
-            &env_reader::env_var(&"WAIT_SLEEP_INTERVAL".to_string(), "".to_string()),
+            &crate::env_reader::env_var(&"WAIT_SLEEP_INTERVAL".to_string(), "".to_string()),
             1,
         ),
     }
