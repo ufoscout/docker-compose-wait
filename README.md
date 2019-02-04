@@ -62,6 +62,11 @@ services:
 When docker-compose is started (or Kubernetes or docker stack or whatever), your application will be started only when all the pairs host:port in the WAIT_HOSTS variable are available.
 The WAIT_HOSTS environment variable is not mandatory, if not declared, the script executes without waiting.
 
+Note that if you wish to use the script directly in the docker-compose.yml file instead of the Dockerfile, you will need to use an approach like the ones disccussed [here](https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands) and [here](https://github.com/docker/compose/issues/2033) because the `command:` configuration option can only execute a single command. For example:
+```
+command: sh -c "/wait && /MySuperApp.sh"
+```
+
 # Additional configuration options
 The behaviour of the wait utility can be configured with the following environment variables:
 - *WAIT_HOSTS*: comma separated list of pairs host:port for which you want to wait.
