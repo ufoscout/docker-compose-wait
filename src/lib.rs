@@ -1,6 +1,5 @@
 pub mod env_reader;
 pub mod sleeper;
-pub mod tcp;
 
 pub struct Config {
     pub hosts: String,
@@ -38,7 +37,7 @@ pub fn wait(sleep: &crate::sleeper::Sleeper, config: &Config, on_timeout: &mut F
         //let start = Instant::now();
         for host in config.hosts.trim().split(',') {
             println!("Checking availability of {}", host);
-            while !tcp::is_reachable(&host.trim().to_string()) {
+            while !port_check::is_port_reachable(&host.trim().to_string()) {
                 println!("Host {} not yet available", host);
                 count += 1;
                 if count > config.timeout {
@@ -98,7 +97,13 @@ fn to_int(number: &str, default: u64) -> u64 {
 mod test {
 
     use super::*;
+    use lazy_static::*;
     use std::env;
+    use std::sync::Mutex;
+
+    lazy_static! {
+        static ref TEST_MUTEX: Mutex<()> = Mutex::new(());
+    }
 
     #[test]
     fn should_return_int_value() {
@@ -124,20 +129,20 @@ mod test {
         assert_eq!(11, value)
     }
 
-    /*
-        #[test]
-        fn default_timeout_should_be_30() {
-            set_env("", "", "10o", "10");
-            let config = config_from_env();
-            assert_eq!("".to_string(), config.hosts);
-            assert_eq!(30, config.timeout);
-            assert_eq!(0, config.wait_before);
-            assert_eq!(10, config.wait_after);
-        }
-    */
+    #[test]
+    fn default_timeout_should_be_30() {
+        let _guard = TEST_MUTEX.lock().unwrap();
+        set_env("", "", "10o", "10", "");
+        let config = config_from_env();
+        assert_eq!("".to_string(), config.hosts);
+        assert_eq!(30, config.timeout);
+        assert_eq!(0, config.wait_before);
+        assert_eq!(10, config.wait_after);
+    }
 
     #[test]
     fn should_get_config_values_from_env() {
+        let _guard = TEST_MUTEX.lock().unwrap();
         set_env("localhost:1234", "20", "2", "3", "4");
         let config = config_from_env();
         assert_eq!("localhost:1234".to_string(), config.hosts);
@@ -147,17 +152,18 @@ mod test {
         assert_eq!(4, config.wait_sleep_interval);
     }
 
-    /*     #[test]
-       fn should_get_default_config_values() {
-           set_env("localhost:1234", "", "", "", "");
-           let config = config_from_env();
-           assert_eq!("localhost:1234".to_string(), config.hosts);
-           assert_eq!(30, config.timeout);
-           assert_eq!(0, config.wait_before);
-           assert_eq!(0, config.wait_after);
-           assert_eq!(1, config.wait_sleep_interval);
-       }
-    */
+    #[test]
+    fn should_get_default_config_values() {
+        let _guard = TEST_MUTEX.lock().unwrap();
+        set_env("localhost:1234", "", "", "", "");
+        let config = config_from_env();
+        assert_eq!("localhost:1234".to_string(), config.hosts);
+        assert_eq!(30, config.timeout);
+        assert_eq!(0, config.wait_before);
+        assert_eq!(0, config.wait_after);
+        assert_eq!(1, config.wait_sleep_interval);
+    }
+
     fn set_env(hosts: &str, timeout: &str, before: &str, after: &str, sleep: &str) {
         env::set_var("WAIT_BEFORE_HOSTS", before.to_string());
         env::set_var("WAIT_AFTER_HOSTS", after.to_string());
