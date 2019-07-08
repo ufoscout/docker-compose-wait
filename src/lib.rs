@@ -39,7 +39,6 @@ pub fn wait(sleep: &mut crate::sleeper::Sleeper, config: &Config, on_timeout: &m
             while !port_check::is_port_reachable(&host.trim().to_string()) {
                 println!("Host {} not yet available", host);
                 if sleep.elapsed(config.timeout) {
-                    //if (start.elapsed().as_secs() > wait_timeout) {
                     println!(
                         "Timeout! After {} seconds some hosts are still not reachable",
                         config.timeout
