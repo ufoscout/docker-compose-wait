@@ -9,7 +9,7 @@ pub struct Config {
     pub wait_sleep_interval: u64,
 }
 
-pub fn wait(sleep: &crate::sleeper::Sleeper, config: &Config, on_timeout: &mut FnMut()) {
+pub fn wait(sleep: &mut crate::sleeper::Sleeper, config: &Config, on_timeout: &mut FnMut()) {
     println!("Docker-compose-wait starting with configuration:");
     println!("------------------------------------------------");
     println!(" - Hosts to be waiting for: [{}]", config.hosts);
@@ -33,15 +33,12 @@ pub fn wait(sleep: &crate::sleeper::Sleeper, config: &Config, on_timeout: &mut F
     }
 
     if !config.hosts.trim().is_empty() {
-        let mut count = 0;
-        //let start = Instant::now();
+        sleep.reset();
         for host in config.hosts.trim().split(',') {
             println!("Checking availability of {}", host);
             while !port_check::is_port_reachable(&host.trim().to_string()) {
                 println!("Host {} not yet available", host);
-                count += 1;
-                if count > config.timeout {
-                    //if (start.elapsed().as_secs() > wait_timeout) {
+                if sleep.elapsed(config.timeout) {
                     println!(
                         "Timeout! After {} seconds some hosts are still not reachable",
                         config.timeout

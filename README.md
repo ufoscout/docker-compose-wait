@@ -7,18 +7,19 @@ A small command line utility to wait for other docker images to be started while
 It permits to wait for a fixed amount of seconds and/or to wait until a TCP port is open on a target image.
 
 # Usage
-This utility should be used in docker build process and launched before your application starts.
+This utility should be used in the docker build process and launched before your application starts.
 
-For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that when it starts all other systems are available, then simply customize your dockerfile this way:
+For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that, when it starts, all other systems are available, then simply customize your dockerfile this way:
 
 ```dockerfile
+## Use whatever base image
 FROM alpine
 
 ## Add your application to the docker image
 ADD MySuperApp.sh /MySuperApp.sh
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.1/wait /wait
 RUN chmod +x /wait
 
 ## Launch the wait tool and then your application
