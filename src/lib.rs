@@ -9,7 +9,11 @@ pub struct Config {
     pub wait_sleep_interval: u64,
 }
 
-pub fn wait(sleep: &mut crate::sleeper::Sleeper, config: &Config, on_timeout: &mut FnMut()) {
+pub fn wait(
+    sleep: &mut dyn crate::sleeper::Sleeper,
+    config: &Config,
+    on_timeout: &mut dyn FnMut(),
+) {
     println!("Docker-compose-wait starting with configuration:");
     println!("------------------------------------------------");
     println!(" - Hosts to be waiting for: [{}]", config.hosts);
