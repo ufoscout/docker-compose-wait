@@ -1,6 +1,6 @@
 [package]
 name = "wait"
-version = "2.5.1"
+version = "2.6.0"
 authors = ["ufoscout <ufoscout@gmail.com>"]
 edition = "2018"
 

@@ -9,13 +9,15 @@ pub struct Config {
     pub wait_sleep_interval: u64,
 }
 
+const LINE_SEPARATOR: &str = "--------------------------------------------------------";
+
 pub fn wait(
     sleep: &mut dyn crate::sleeper::Sleeper,
     config: &Config,
     on_timeout: &mut dyn FnMut(),
 ) {
-    println!("Docker-compose-wait starting with configuration:");
-    println!("------------------------------------------------");
+    println!("{}", LINE_SEPARATOR);
+    println!("docker-compose-wait - starting with configuration:");
     println!(" - Hosts to be waiting for: [{}]", config.hosts);
     println!(" - Timeout before failure: {} seconds ", config.timeout);
     println!(
@@ -26,13 +28,14 @@ pub fn wait(
         " - Sleeping time once all hosts are available: {} seconds",
         config.wait_after
     );
-    println!("------------------------------------------------");
+    println!("{}", LINE_SEPARATOR);
 
     if config.wait_before > 0 {
         println!(
             "Waiting {} seconds before checking for hosts availability",
             config.wait_before
         );
+        println!("{}", LINE_SEPARATOR);
         sleep.sleep(config.wait_before);
     }
 
@@ -41,7 +44,7 @@ pub fn wait(
         for host in config.hosts.trim().split(',') {
             println!("Checking availability of {}", host);
             while !port_check::is_port_reachable(&host.trim().to_string()) {
-                println!("Host {} not yet available", host);
+                println!("Host {} not yet available...", host);
                 if sleep.elapsed(config.timeout) {
                     println!(
                         "Timeout! After {} seconds some hosts are still not reachable",
@@ -52,7 +55,8 @@ pub fn wait(
                 }
                 sleep.sleep(config.wait_sleep_interval);
             }
-            println!("Host {} is now available", host);
+            println!("Host {} is now available!", host);
+            println!("{}", LINE_SEPARATOR);
         }
     }
 
@@ -61,8 +65,12 @@ pub fn wait(
             "Waiting {} seconds after hosts availability",
             config.wait_after
         );
+        println!("{}", LINE_SEPARATOR);
         sleep.sleep(config.wait_after);
     }
+
+    println!("docker-compose-wait - Everything's fine, the application can now start!");
+    println!("{}", LINE_SEPARATOR);
 }
 
 pub fn config_from_env() -> Config {
