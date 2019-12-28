@@ -11,7 +11,7 @@ fn should_wait_5_seconds_before() {
     let mut sleeper = MillisSleeper::default();
     wait::wait(
         &mut sleeper,
-        &new_config("", 1, wait_for, 0, 1),
+        &new_config("", 1, wait_for, 0, 1, 1),
         &mut on_timeout,
     );
     assert!(millis_elapsed(start) >= wait_for)
@@ -24,7 +24,7 @@ fn should_wait_10_seconds_after() {
     let mut sleeper = MillisSleeper::default();
     wait::wait(
         &mut sleeper,
-        &new_config("", 1, 0, wait_for, 1),
+        &new_config("", 1, 0, wait_for, 1, 1),
         &mut on_timeout,
     );
     assert!(millis_elapsed(start) >= wait_for)
@@ -37,7 +37,7 @@ fn should_wait_before_and_after() {
     let mut sleeper = MillisSleeper::default();
     wait::wait(
         &mut sleeper,
-        &new_config("", 1, wait_for, wait_for, 1),
+        &new_config("", 1, wait_for, wait_for, 1, 1),
         &mut on_timeout,
     );
     assert!(millis_elapsed(start) >= (wait_for + wait_for))
@@ -47,8 +47,18 @@ fn should_wait_before_and_after() {
 fn should_execute_without_wait() {
     let start = Instant::now();
     let mut sleeper = MillisSleeper::default();
-    wait::wait(&mut sleeper, &new_config("", 1, 0, 0, 1), &mut on_timeout);
+    wait::wait(&mut sleeper, &new_config("", 1, 0, 0, 1, 1), &mut on_timeout);
     assert!(millis_elapsed(start) <= 5)
+}
+
+#[test]
+fn should_sleep_the_specified_time_between_checks() {
+    let start = Instant::now();
+    let mut sleeper = MillisSleeper::default();
+    wait::wait(&mut sleeper, &new_config("198.19.255.255:1", 2_000, 0, 0, 10, 1), &mut on_timeout);
+    let elapsed = millis_elapsed(start);
+    assert!(elapsed >= 2010);
+    assert!(elapsed < 3000);
 }
 
 #[test]
@@ -56,7 +66,7 @@ fn should_exit_on_timeout() {
     let timeout = 25;
     let wait_before = 30;
     let wait_after = 300;
-    let hosts = "localhost:".to_string() + &free_port().to_string();
+    let hosts = format!("127.0.0.1:{}", free_port());
     let start = Instant::now();
     let mut sleeper = MillisSleeper::default();
 
@@ -68,7 +78,7 @@ fn should_exit_on_timeout() {
 
     wait::wait(
         &mut sleeper,
-        &new_config(&hosts, timeout, wait_before, wait_after, 1),
+        &new_config(&hosts, timeout, wait_before, wait_after, 1, 1),
         &mut fun,
     );
 
@@ -101,7 +111,7 @@ fn should_identify_the_open_port() {
     thread::sleep(time::Duration::from_millis(250));
     wait::wait(
         &mut sleeper,
-        &new_config(&hosts, timeout, wait_before, wait_after, 1),
+        &new_config(&hosts, timeout, wait_before, wait_after, 1, 1),
         &mut fun,
     );
 
@@ -137,7 +147,7 @@ fn should_wait_multiple_hosts() {
     thread::sleep(time::Duration::from_millis(250));
     wait::wait(
         &mut sleeper,
-        &new_config(&hosts, timeout, wait_before, wait_after, 1),
+        &new_config(&hosts, timeout, wait_before, wait_after, 1, 1),
         &mut fun,
     );
 
@@ -170,7 +180,7 @@ fn should_fail_if_not_all_hosts_are_available() {
     thread::sleep(time::Duration::from_millis(250));
     wait::wait(
         &mut sleeper,
-        &new_config(&hosts, timeout, wait_before, wait_after, 1),
+        &new_config(&hosts, timeout, wait_before, wait_after, 1, 1),
         &mut fun,
     );
 
@@ -182,10 +192,11 @@ fn should_fail_if_not_all_hosts_are_available() {
 
 fn on_timeout() {}
 
-fn new_config(hosts: &str, timeout: u64, before: u64, after: u64, sleep: u64) -> wait::Config {
+fn new_config(hosts: &str, timeout: u64, before: u64, after: u64, sleep: u64, tcp_connection_timeout: u64) -> wait::Config {
     wait::Config {
         hosts: hosts.to_string(),
-        timeout: timeout,
+        global_timeout: timeout,
+        tcp_connection_timeout,
         wait_before: before,
         wait_after: after,
         wait_sleep_interval: sleep,
@@ -216,7 +227,7 @@ fn free_port() -> u16 {
 }
 
 fn millis_elapsed(start: Instant) -> u64 {
-    let elapsed = start.elapsed().subsec_nanos() / 1000000;
+    let elapsed = start.elapsed().as_millis();
     println!("Millis elapsed {}", elapsed);
     elapsed as u64
 }

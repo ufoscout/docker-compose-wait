@@ -74,7 +74,8 @@ This is discussed further [here](https://stackoverflow.com/questions/30063907/us
 # Additional configuration options
 The behaviour of the wait utility can be configured with the following environment variables:
 - *WAIT_HOSTS*: comma separated list of pairs host:port for which you want to wait.
-- *WAIT_HOSTS_TIMEOUT*: max number of seconds to wait for the hosts to be available before failure. The default is 30 seconds.
+- *WAIT_HOSTS_TIMEOUT*: max number of seconds to wait for all the hosts to be available before failure. The default is 30 seconds.
+- *WAIT_HOST_CONNECT_TIMEOUT*: The timeout of a single TCP connection to a remote host before attempting a new connection. The default is 5 seconds.
 - *WAIT_BEFORE_HOSTS*: number of seconds to wait (sleep) before start checking for the hosts availability
 - *WAIT_AFTER_HOSTS*: number of seconds to wait (sleep) once all the hosts are available
 - *WAIT_SLEEP_INTERVAL*: number of seconds to sleep between retries. The default is 1 second.
