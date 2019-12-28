@@ -19,7 +19,7 @@ FROM alpine
 ADD MySuperApp.sh /MySuperApp.sh
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.6.0/wait /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.0/wait /wait
 RUN chmod +x /wait
 
 ## Launch the wait tool and then your application
@@ -95,6 +95,7 @@ programming language, the build process is just a simple `cargo build --release`
 (well... of course you need to install the rust compiler before...) 
 
 For everything involving cross-compilation, you should take a look at [Cross](https://github.com/rust-embedded/cross). 
+
 For example, to build for a **raspberry pi**, everything you have to do is:
 1. Install the latest stable rust toolchain using rustup
 2. Correctly configure Docker on your machine
@@ -103,7 +104,7 @@ For example, to build for a **raspberry pi**, everything you have to do is:
    cargo install cross
    cross build --target=armv7-unknown-linux-musleabihf --release
    ```
-4. use your new shiny executable on your raspberry device!
+4. use your shiny new executable on your raspberry device!
 
 
 # Notes
