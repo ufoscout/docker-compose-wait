@@ -20,10 +20,18 @@ pub fn wait(
     on_timeout: &mut dyn FnMut(),
 ) {
     println!("{}", LINE_SEPARATOR);
-    println!("docker-compose-wait - starting with configuration:");
+    println!(" docker-compose-wait {}", env!("CARGO_PKG_VERSION"));
+    println!("---------------------------");
+    println!("Starting with configuration:");
     println!(" - Hosts to be waiting for: [{}]", config.hosts);
-    println!(" - Timeout before failure: {} seconds ", config.global_timeout);
-    println!(" - TCP connection timeout before retry: {} seconds ", config.tcp_connection_timeout);
+    println!(
+        " - Timeout before failure: {} seconds ",
+        config.global_timeout
+    );
+    println!(
+        " - TCP connection timeout before retry: {} seconds ",
+        config.tcp_connection_timeout
+    );
     println!(
         " - Sleeping time before checking for hosts availability: {} seconds",
         config.wait_before
@@ -51,7 +59,14 @@ pub fn wait(
         sleep.reset();
         for host in config.hosts.trim().split(',') {
             println!("Checking availability of {}", host);
-            while !port_check::is_port_reachable_with_timeout(&host.trim().to_string().parse().expect("The host IP should be valid"), Duration::from_secs(config.tcp_connection_timeout)) {
+            while !port_check::is_port_reachable_with_timeout(
+                &host
+                    .trim()
+                    .to_string()
+                    .parse()
+                    .expect("The host IP should be valid"),
+                Duration::from_secs(config.tcp_connection_timeout),
+            ) {
                 println!("Host {} not yet available...", host);
                 if sleep.elapsed(config.global_timeout) {
                     println!(
@@ -188,7 +203,14 @@ mod test {
         assert_eq!(1, config.wait_sleep_interval);
     }
 
-    fn set_env(hosts: &str, timeout: &str, before: &str, after: &str, sleep: &str, tcp_timeout: &str) {
+    fn set_env(
+        hosts: &str,
+        timeout: &str,
+        before: &str,
+        after: &str,
+        sleep: &str,
+        tcp_timeout: &str,
+    ) {
         env::set_var("WAIT_BEFORE_HOSTS", before.to_string());
         env::set_var("WAIT_AFTER_HOSTS", after.to_string());
         env::set_var("WAIT_HOSTS_TIMEOUT", timeout.to_string());

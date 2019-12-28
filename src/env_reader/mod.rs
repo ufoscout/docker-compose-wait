@@ -41,5 +41,4 @@ mod test {
         nanosec = nanosec + 10;
         assert_eq!(nanosec.to_string(), env_var(&env_key, nanosec.to_string()));
     }
-
 }

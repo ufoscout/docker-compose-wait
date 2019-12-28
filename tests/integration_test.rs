@@ -47,7 +47,11 @@ fn should_wait_before_and_after() {
 fn should_execute_without_wait() {
     let start = Instant::now();
     let mut sleeper = MillisSleeper::default();
-    wait::wait(&mut sleeper, &new_config("", 1, 0, 0, 1, 1), &mut on_timeout);
+    wait::wait(
+        &mut sleeper,
+        &new_config("", 1, 0, 0, 1, 1),
+        &mut on_timeout,
+    );
     assert!(millis_elapsed(start) <= 5)
 }
 
@@ -55,7 +59,11 @@ fn should_execute_without_wait() {
 fn should_sleep_the_specified_time_between_checks() {
     let start = Instant::now();
     let mut sleeper = MillisSleeper::default();
-    wait::wait(&mut sleeper, &new_config("198.19.255.255:1", 2_000, 0, 0, 10, 1), &mut on_timeout);
+    wait::wait(
+        &mut sleeper,
+        &new_config("198.19.255.255:1", 2_000, 0, 0, 10, 1),
+        &mut on_timeout,
+    );
     let elapsed = millis_elapsed(start);
     assert!(elapsed >= 2010);
     assert!(elapsed < 3000);
@@ -192,7 +200,14 @@ fn should_fail_if_not_all_hosts_are_available() {
 
 fn on_timeout() {}
 
-fn new_config(hosts: &str, timeout: u64, before: u64, after: u64, sleep: u64, tcp_connection_timeout: u64) -> wait::Config {
+fn new_config(
+    hosts: &str,
+    timeout: u64,
+    before: u64,
+    after: u64,
+    sleep: u64,
+    tcp_connection_timeout: u64,
+) -> wait::Config {
     wait::Config {
         hosts: hosts.to_string(),
         global_timeout: timeout,
