@@ -32,6 +32,10 @@ pub fn wait(
         " - Sleeping time once all hosts are available: {} seconds",
         config.wait_after
     );
+    println!(
+        " - Sleeping time between retries: {} seconds",
+        config.wait_sleep_interval
+    );
     println!("{}", LINE_SEPARATOR);
 
     if config.wait_before > 0 {
