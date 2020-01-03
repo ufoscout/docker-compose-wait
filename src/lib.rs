@@ -62,9 +62,7 @@ pub fn wait(
             while !port_check::is_port_reachable_with_timeout(
                 &host
                     .trim()
-                    .to_string()
-                    .parse()
-                    .expect("The host IP should be valid"),
+                    .to_string(),
                 Duration::from_secs(config.tcp_connection_timeout),
             ) {
                 println!("Host {} not yet available...", host);

@@ -74,7 +74,7 @@ fn should_exit_on_timeout() {
     let timeout = 25;
     let wait_before = 30;
     let wait_after = 300;
-    let hosts = format!("127.0.0.1:{}", free_port());
+    let hosts = format!("localhost:{}", free_port());
     let start = Instant::now();
     let mut sleeper = MillisSleeper::default();
 
