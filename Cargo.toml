@@ -1,11 +1,11 @@
 [package]
 name = "wait"
-version = "2.7.2"
+version = "2.7.3"
 authors = ["ufoscout <ufoscout@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-port_check = "0.1.4"
+port_check = "0.1.5"
 
 [dev-dependencies]
 atomic-counter = "1.0"
