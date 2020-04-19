@@ -2,11 +2,13 @@
 
 [![Build Status](https://travis-ci.org/ufoscout/docker-compose-wait.svg?branch=master)](https://travis-ci.org/ufoscout/docker-compose-wait)
 [![codecov](https://codecov.io/gh/ufoscout/docker-compose-wait/branch/master/graph/badge.svg)](https://codecov.io/gh/ufoscout/docker-compose-wait)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9c2359ba5534f58a4b178191acb836a)](https://www.codacy.com/manual/edumco/docker-compose-wait?utm_source=github.com&utm_medium=referral&utm_content=edumco/docker-compose-wait&utm_campaign=Badge_Grade)
 
 A small command line utility to wait for other docker images to be started while using docker-compose.
 It permits to wait for a fixed amount of seconds and/or to wait until a TCP port is open on a target image.
 
-# Usage
+## Usage
+
 This utility should be used in the docker build process and launched before your application starts.
 
 For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow!) and you want to be sure that, when it starts, all other systems are available, then simply customize your dockerfile this way:
@@ -34,7 +36,6 @@ Now let's modify the docker-compose.yml file:
 version: "3"
 
 services:
-
   mongo:
     image: mongo:3.4
     hostname: mongo
@@ -65,47 +66,53 @@ The WAIT_HOSTS environment variable is not mandatory, if not declared, the scrip
 
 If you want to use the script directly in docker-compose.yml instead of the Dockerfile, please note that the `command:` configuration option is limited to a single command so you should wrap in a `sh` call. For example:
 
-```
+```bash
 command: sh -c "/wait && /MySuperApp.sh"
 ```
 
 This is discussed further [here](https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands) and [here](https://github.com/docker/compose/issues/2033).
 
-# Additional configuration options
-The behaviour of the wait utility can be configured with the following environment variables:
-- *WAIT_HOSTS*: comma separated list of pairs host:port for which you want to wait.
-- *WAIT_HOSTS_TIMEOUT*: max number of seconds to wait for all the hosts to be available before failure. The default is 30 seconds.
-- *WAIT_HOST_CONNECT_TIMEOUT*: The timeout of a single TCP connection to a remote host before attempting a new connection. The default is 5 seconds.
-- *WAIT_BEFORE_HOSTS*: number of seconds to wait (sleep) before start checking for the hosts availability
-- *WAIT_AFTER_HOSTS*: number of seconds to wait (sleep) once all the hosts are available
-- *WAIT_SLEEP_INTERVAL*: number of seconds to sleep between retries. The default is 1 second.
+## Additional configuration options
 
-# Using on non-linux systems
+The behaviour of the wait utility can be configured with the following environment variables:
+
+- _WAIT_HOSTS_: comma separated list of pairs host:port for which you want to wait.
+- _WAIT_HOSTS_TIMEOUT_: max number of seconds to wait for all the hosts to be available before failure. The default is 30 seconds.
+- _WAIT_HOST_CONNECT_TIMEOUT_: The timeout of a single TCP connection to a remote host before attempting a new connection. The default is 5 seconds.
+- _WAIT_BEFORE_HOSTS_: number of seconds to wait (sleep) before start checking for the hosts availability
+- _WAIT_AFTER_HOSTS_: number of seconds to wait (sleep) once all the hosts are available
+- _WAIT_SLEEP_INTERVAL_: number of seconds to sleep between retries. The default is 1 second.
+
+## Using on non-linux systems
+
 The simplest way of getting the _wait_ executable is to download it from
 
-https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait
+[https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait](https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait)
 
-This is a pre-built executable for Linux x64 systems which are the default ones in Docker. 
+This is a pre-built executable for Linux x64 systems which are the default ones in Docker.
 In addition, it is built with [MUSL](https://www.musl-libc.org/) for maximum portability.
 
 If you need it for a different architecture, you should clone this repository and build it for your target.
 
-As it has no external dependencies, an being written in the mighty [rust](https://www.rust-lang.org) 
-programming language, the build process is just a simple `cargo build --release` 
-(well... of course you need to install the rust compiler before...) 
+As it has no external dependencies, an being written in the mighty [rust](https://www.rust-lang.org)
+programming language, the build process is just a simple `cargo build --release`
+(well... of course you need to install the rust compiler before...)
 
-For everything involving cross-compilation, you should take a look at [Cross](https://github.com/rust-embedded/cross). 
+For everything involving cross-compilation, you should take a look at [Cross](https://github.com/rust-embedded/cross).
 
 For example, to build for a **raspberry pi**, everything you have to do is:
+
 1. Install the latest stable rust toolchain using rustup
 2. Correctly configure Docker on your machine
 3. Open a terminal and type:
-   ```bash
-   cargo install cross
-   cross build --target=armv7-unknown-linux-musleabihf --release
-   ```
-4. use your shiny new executable on your raspberry device!
 
+```bash
+cargo install cross
+cross build --target=armv7-unknown-linux-musleabihf --release
+```
 
-# Notes
+Use your shiny new executable on your raspberry device!
+
+## Notes
+
 This utility was explicitly written to be used with docker-compose; however, it can be used everywhere since it has no dependencies on docker.
