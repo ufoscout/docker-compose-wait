@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ufoscout/docker-compose-wait.svg?branch=master)](https://travis-ci.org/ufoscout/docker-compose-wait)
 [![codecov](https://codecov.io/gh/ufoscout/docker-compose-wait/branch/master/graph/badge.svg)](https://codecov.io/gh/ufoscout/docker-compose-wait)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9c2359ba5534f58a4b178191acb836a)](https://www.codacy.com/manual/edumco/docker-compose-wait?utm_source=github.com&utm_medium=referral&utm_content=edumco/docker-compose-wait&utm_campaign=Badge_Grade)
 
 A small command line utility to wait for other docker images to be started while using docker-compose.
 It permits to wait for a fixed amount of seconds and/or to wait until a TCP port is open on a target image.
