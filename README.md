@@ -65,7 +65,7 @@ The WAIT_HOSTS environment variable is not mandatory, if not declared, the scrip
 
 If you want to use the script directly in docker-compose.yml instead of the Dockerfile, please note that the `command:` configuration option is limited to a single command so you should wrap in a `sh` call. For example:
 
-```
+```bash
 command: sh -c "/wait && /MySuperApp.sh"
 ```
 
@@ -86,7 +86,7 @@ The behaviour of the wait utility can be configured with the following environme
 
 The simplest way of getting the _wait_ executable is to download it from
 
-https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait
+[https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait](https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait)
 
 This is a pre-built executable for Linux x64 systems which are the default ones in Docker.
 In addition, it is built with [MUSL](https://www.musl-libc.org/) for maximum portability.
@@ -104,11 +104,13 @@ For example, to build for a **raspberry pi**, everything you have to do is:
 1. Install the latest stable rust toolchain using rustup
 2. Correctly configure Docker on your machine
 3. Open a terminal and type:
-   ```bash
-   cargo install cross
-   cross build --target=armv7-unknown-linux-musleabihf --release
-   ```
-4. use your shiny new executable on your raspberry device!
+
+```bash
+cargo install cross
+cross build --target=armv7-unknown-linux-musleabihf --release
+```
+
+Use your shiny new executable on your raspberry device!
 
 ## Notes
 
