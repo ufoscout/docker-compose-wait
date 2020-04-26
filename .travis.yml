@@ -1,13 +1,14 @@
 language: rust
 
-sudo: true
+os: linux
+  dist: xenial
 
 rust:
   - stable
   - beta
   - nightly
 
-matrix:
+jobs:
   allow_failures:
     - rust: nightly
 
