@@ -2,14 +2,14 @@ language: rust
 
 os: linux
   
-  dist: "xenial"
+dist: "xenial"
 
 rust:
   - stable
   - beta
   - nightly
 
-jobs:
+matrix:
   allow_failures:
     - rust: nightly
 
