@@ -9,7 +9,7 @@ rust:
   - beta
   - nightly
 
-matrix:
+jobs:
   allow_failures:
     - rust: nightly
 
