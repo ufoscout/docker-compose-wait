@@ -73,6 +73,10 @@ command: sh -c "/wait && /MySuperApp.sh"
 
 This is discussed further [here](https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands) and [here](https://github.com/docker/compose/issues/2033).
 
+Do note the recommended way of using `wait` is with the shell operator `&&`, which implies the requirement of a shell. This introduces a requirement for Docker use where bases images like [scratch](https://hub.docker.com/_/scratch) not offering a shell cannot be used.
+
+Instead the recommendation for base Docker images are ones offering a shell like [alpine](https://hub.docker.com/_/alpine), [debian](https://hub.docker.com/_/debian) etc. and if you want to aim for _minimalism_, evaluate something like: [busybox](https://hub.docker.com/_/busybox)
+
 ## Additional configuration options
 
 The behaviour of the wait utility can be configured with the following environment variables:
