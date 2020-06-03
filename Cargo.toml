@@ -10,7 +10,7 @@ port_check = "0.1.5"
 [dev-dependencies]
 atomic-counter = "1.0"
 lazy_static = "1.4"
-time = "0.1.40"
+time = "0.2.16"
 
 [profile.release]
 opt-level = 'z'  # Optimize for size.
