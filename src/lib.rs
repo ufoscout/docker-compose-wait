@@ -1,3 +1,4 @@
+use log::*;
 use std::time::Duration;
 
 pub mod env_reader;
@@ -19,55 +20,53 @@ pub fn wait(
     config: &Config,
     on_timeout: &mut dyn FnMut(),
 ) {
-    println!("{}", LINE_SEPARATOR);
-    println!(" docker-compose-wait {}", env!("CARGO_PKG_VERSION"));
-    println!("---------------------------");
-    println!("Starting with configuration:");
-    println!(" - Hosts to be waiting for: [{}]", config.hosts);
-    println!(
+    info!("{}", LINE_SEPARATOR);
+    info!(" docker-compose-wait {}", env!("CARGO_PKG_VERSION"));
+    info!("---------------------------");
+    debug!("Starting with configuration:");
+    debug!(" - Hosts to be waiting for: [{}]", config.hosts);
+    debug!(
         " - Timeout before failure: {} seconds ",
         config.global_timeout
     );
-    println!(
+    debug!(
         " - TCP connection timeout before retry: {} seconds ",
         config.tcp_connection_timeout
     );
-    println!(
+    debug!(
         " - Sleeping time before checking for hosts availability: {} seconds",
         config.wait_before
     );
-    println!(
+    debug!(
         " - Sleeping time once all hosts are available: {} seconds",
         config.wait_after
     );
-    println!(
+    debug!(
         " - Sleeping time between retries: {} seconds",
         config.wait_sleep_interval
     );
-    println!("{}", LINE_SEPARATOR);
+    debug!("{}", LINE_SEPARATOR);
 
     if config.wait_before > 0 {
-        println!(
+        info!(
             "Waiting {} seconds before checking for hosts availability",
             config.wait_before
         );
-        println!("{}", LINE_SEPARATOR);
+        info!("{}", LINE_SEPARATOR);
         sleep.sleep(config.wait_before);
     }
 
     if !config.hosts.trim().is_empty() {
         sleep.reset();
         for host in config.hosts.trim().split(',') {
-            println!("Checking availability of {}", host);
+            info!("Checking availability of {}", host);
             while !port_check::is_port_reachable_with_timeout(
-                &host
-                    .trim()
-                    .to_string(),
+                &host.trim().to_string(),
                 Duration::from_secs(config.tcp_connection_timeout),
             ) {
-                println!("Host {} not yet available...", host);
+                info!("Host {} not yet available...", host);
                 if sleep.elapsed(config.global_timeout) {
-                    println!(
+                    error!(
                         "Timeout! After {} seconds some hosts are still not reachable",
                         config.global_timeout
                     );
@@ -76,22 +75,22 @@ pub fn wait(
                 }
                 sleep.sleep(config.wait_sleep_interval);
             }
-            println!("Host {} is now available!", host);
-            println!("{}", LINE_SEPARATOR);
+            info!("Host {} is now available!", host);
+            info!("{}", LINE_SEPARATOR);
         }
     }
 
     if config.wait_after > 0 {
-        println!(
+        info!(
             "Waiting {} seconds after hosts availability",
             config.wait_after
         );
-        println!("{}", LINE_SEPARATOR);
+        info!("{}", LINE_SEPARATOR);
         sleep.sleep(config.wait_after);
     }
 
-    println!("docker-compose-wait - Everything's fine, the application can now start!");
-    println!("{}", LINE_SEPARATOR);
+    info!("docker-compose-wait - Everything's fine, the application can now start!");
+    info!("{}", LINE_SEPARATOR);
 }
 
 pub fn config_from_env() -> Config {
