@@ -81,6 +81,7 @@ Instead the recommendation for base Docker images are ones offering a shell like
 
 The behaviour of the wait utility can be configured with the following environment variables:
 
+- _WAIT_LOGGER_LEVEL_ : the output logger level. Valid values are: _debug_, _info_, _error_, _off_. the default is _debug_. 
 - _WAIT_HOSTS_: comma separated list of pairs host:port for which you want to wait.
 - _WAIT_HOSTS_TIMEOUT_: max number of seconds to wait for all the hosts to be available before failure. The default is 30 seconds.
 - _WAIT_HOST_CONNECT_TIMEOUT_: The timeout of a single TCP connection to a remote host before attempting a new connection. The default is 5 seconds.
