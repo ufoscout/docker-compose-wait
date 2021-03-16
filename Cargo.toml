@@ -12,7 +12,7 @@ env_logger = { version = "0.8", default-features = false }
 [dev-dependencies]
 atomic-counter = "1.0"
 lazy_static = "1.4"
-time = "0.1.40"
+time = "0.2.26"
 
 [profile.release]
 opt-level = 'z'  # Optimize for size.
