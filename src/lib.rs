@@ -1,11 +1,13 @@
 use log::*;
 use std::time::Duration;
+use std::path::Path;
 
 pub mod env_reader;
 pub mod sleeper;
 
 pub struct Config {
     pub hosts: String,
+    pub paths: String,
     pub global_timeout: u64,
     pub tcp_connection_timeout: u64,
     pub wait_before: u64,
@@ -25,6 +27,7 @@ pub fn wait(
     info!("---------------------------");
     debug!("Starting with configuration:");
     debug!(" - Hosts to be waiting for: [{}]", config.hosts);
+    debug!(" - Paths to be waiting for: [{}]", config.paths);
     debug!(
         " - Timeout before failure: {} seconds ",
         config.global_timeout
@@ -34,11 +37,11 @@ pub fn wait(
         config.tcp_connection_timeout
     );
     debug!(
-        " - Sleeping time before checking for hosts availability: {} seconds",
+        " - Sleeping time before checking for hosts/paths availability: {} seconds",
         config.wait_before
     );
     debug!(
-        " - Sleeping time once all hosts are available: {} seconds",
+        " - Sleeping time once all hosts/paths are available: {} seconds",
         config.wait_after
     );
     debug!(
@@ -49,22 +52,23 @@ pub fn wait(
 
     if config.wait_before > 0 {
         info!(
-            "Waiting {} seconds before checking for hosts availability",
+            "Waiting {} seconds before checking for hosts/paths availability",
             config.wait_before
         );
         info!("{}", LINE_SEPARATOR);
         sleep.sleep(config.wait_before);
     }
 
+    sleep.reset();
+
     if !config.hosts.trim().is_empty() {
-        sleep.reset();
         for host in config.hosts.trim().split(',') {
-            info!("Checking availability of {}", host);
+            info!("Checking availability of host [{}]", host);
             while !port_check::is_port_reachable_with_timeout(
                 &host.trim().to_string(),
                 Duration::from_secs(config.tcp_connection_timeout),
             ) {
-                info!("Host {} not yet available...", host);
+                info!("Host [{}] not yet available...", host);
                 if sleep.elapsed(config.global_timeout) {
                     error!(
                         "Timeout! After {} seconds some hosts are still not reachable",
@@ -75,14 +79,34 @@ pub fn wait(
                 }
                 sleep.sleep(config.wait_sleep_interval);
             }
-            info!("Host {} is now available!", host);
+            info!("Host [{}] is now available!", host);
+            info!("{}", LINE_SEPARATOR);
+        }
+    }
+
+    if !config.paths.trim().is_empty() {
+        for path in config.paths.trim().split(',') {
+            info!("Checking availability of path [{}]", path);
+            while !Path::new(path.trim()).exists() {
+                info!("Path {} not yet available...", path);
+                if sleep.elapsed(config.global_timeout) {
+                    error!(
+                        "Timeout! After [{}] seconds some paths are still not reachable",
+                        config.global_timeout
+                    );
+                    on_timeout();
+                    return;
+                }
+                sleep.sleep(config.wait_sleep_interval);
+            }
+            info!("Path [{}] is now available!", path);
             info!("{}", LINE_SEPARATOR);
         }
     }
 
     if config.wait_after > 0 {
         info!(
-            "Waiting {} seconds after hosts availability",
+            "Waiting {} seconds after hosts/paths availability",
             config.wait_after
         );
         info!("{}", LINE_SEPARATOR);
@@ -96,6 +120,7 @@ pub fn wait(
 pub fn config_from_env() -> Config {
     Config {
         hosts: crate::env_reader::env_var(&"WAIT_HOSTS".to_string(), "".to_string()),
+        paths: crate::env_reader::env_var(&"WAIT_PATHS".to_string(), "".to_string()),
         global_timeout: to_int(
             &crate::env_reader::env_var(&"WAIT_HOSTS_TIMEOUT".to_string(), "".to_string()),
             30,
