@@ -11,7 +11,6 @@ env_logger = { version = "0.8", default-features = false }
 
 [dev-dependencies]
 atomic-counter = "1.0"
-chrono = "0.4"
 lazy_static = "1.4"
 rand = "0.8"
 

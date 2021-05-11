@@ -12,7 +12,6 @@ mod test {
 
     use super::*;
     use std::env;
-    use chrono::Utc;
 
     #[test]
     fn should_return_an_env_variable() {
@@ -35,9 +34,9 @@ mod test {
 
     #[test]
     fn should_return_the_default_value_if_env_variable_not_present() {
-        let mut nanosec = Utc::now().timestamp_nanos();
-        let env_key = nanosec.to_string();
-        nanosec = nanosec + 10;
-        assert_eq!(nanosec.to_string(), env_var(&env_key, nanosec.to_string()));
+        let mut random: i64 = rand::random();
+        let env_key = random.to_string();
+        random = random + 10;
+        assert_eq!(random.to_string(), env_var(&env_key, random.to_string()));
     }
 }

@@ -5,8 +5,12 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9c2359ba5534f58a4b178191acb836a)](https://www.codacy.com/manual/edumco/docker-compose-wait?utm_source=github.com&utm_medium=referral&utm_content=edumco/docker-compose-wait&utm_campaign=Badge_Grade)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fedumco%2Fdocker-compose-wait.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fedumco%2Fdocker-compose-wait?ref=badge_shield)
 
-A small command line utility to wait for other docker images to be started while using docker-compose.
-It permits to wait for a fixed amount of seconds and/or to wait until a TCP port is open on a target image.
+A small command-line utility to wait for other docker images to be started while using docker-compose.
+
+It permits waiting for:
+- a fixed amount of seconds
+- until a TCP port is open on a target image
+- until a file or directory is present on the local filesystem
 
 ## Usage
 
@@ -18,12 +22,12 @@ For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow
 ## Use whatever base image
 FROM alpine
 
+## Add the wait script to the image
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
+RUN chmod +x /wait
+
 ## Add your application to the docker image
 ADD MySuperApp.sh /MySuperApp.sh
-
-## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.8.0/wait /wait
-RUN chmod +x /wait
 
 ## Launch the wait tool and then your application
 CMD /wait && /MySuperApp.sh
@@ -82,11 +86,12 @@ Instead the recommendation for base Docker images are ones offering a shell like
 The behaviour of the wait utility can be configured with the following environment variables:
 
 - _WAIT_LOGGER_LEVEL_ : the output logger level. Valid values are: _debug_, _info_, _error_, _off_. the default is _debug_. 
-- _WAIT_HOSTS_: comma separated list of pairs host:port for which you want to wait.
-- _WAIT_HOSTS_TIMEOUT_: max number of seconds to wait for all the hosts to be available before failure. The default is 30 seconds.
+- _WAIT_HOSTS_: comma-separated list of pairs host:port for which you want to wait.
+- _WAIT_PATHS_: comma-separated list of paths (i.e. files or directories) on the local filesystem for which you want to wait until they exist.
+- _WAIT_TIMEOUT_: max number of seconds to wait for all the hosts/paths to be available before failure. The default is 30 seconds.
 - _WAIT_HOST_CONNECT_TIMEOUT_: The timeout of a single TCP connection to a remote host before attempting a new connection. The default is 5 seconds.
-- _WAIT_BEFORE_HOSTS_: number of seconds to wait (sleep) before start checking for the hosts availability
-- _WAIT_AFTER_HOSTS_: number of seconds to wait (sleep) once all the hosts are available
+- _WAIT_BEFORE_: number of seconds to wait (sleep) before start checking for the hosts/paths availability
+- _WAIT_AFTER_: number of seconds to wait (sleep) once all the hosts/paths are available
 - _WAIT_SLEEP_INTERVAL_: number of seconds to sleep between retries. The default is 1 second.
 
 ## Using on non-linux systems
