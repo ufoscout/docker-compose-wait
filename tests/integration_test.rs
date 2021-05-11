@@ -1,9 +1,9 @@
 use atomic_counter::AtomicCounter;
+use std::fs::{create_dir_all, File};
 use std::net::{Ipv4Addr, SocketAddrV4, TcpListener};
 use std::time::Instant;
 use std::{thread, time};
 use wait::sleeper::*;
-use std::fs::{create_dir_all, File};
 
 #[test]
 fn should_wait_for_5_seconds_before() {
@@ -12,7 +12,7 @@ fn should_wait_for_5_seconds_before() {
     let mut sleeper = MillisSleeper::default();
     wait::wait(
         &mut sleeper,
-        &new_config("", "",1, wait_for, 0, 1, 1),
+        &new_config("", "", 1, wait_for, 0, 1, 1),
         &mut on_timeout,
     );
     assert!(millis_elapsed(start) >= wait_for)
@@ -62,7 +62,7 @@ fn should_sleep_the_specified_time_between_host_checks() {
     let mut sleeper = MillisSleeper::default();
     wait::wait(
         &mut sleeper,
-        &new_config("198.19.255.255:1", "",2_000, 0, 0, 10, 1),
+        &new_config("198.19.255.255:1", "", 2_000, 0, 0, 10, 1),
         &mut on_timeout,
     );
     let elapsed = millis_elapsed(start);
@@ -76,7 +76,15 @@ fn should_sleep_the_specified_time_between_path_checks() {
     let mut sleeper = MillisSleeper::default();
     wait::wait(
         &mut sleeper,
-        &new_config("", "./target/dsfasdfreworthkjiewuryiwghfsikahfsjfskjf",2_000, 0, 0, 11, 1),
+        &new_config(
+            "",
+            "./target/dsfasdfreworthkjiewuryiwghfsikahfsjfskjf",
+            2_000,
+            0,
+            0,
+            11,
+            1,
+        ),
         &mut on_timeout,
     );
     let elapsed = millis_elapsed(start);
@@ -307,7 +315,6 @@ fn should_wait_for_multiple_hosts_and_paths() {
     assert!(millis_elapsed(start) >= wait_before + wait_after);
     assert!(millis_elapsed(start) < timeout + wait_before + wait_after);
 }
-
 
 #[test]
 fn should_fail_if_not_all_hosts_are_available() {

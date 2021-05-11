@@ -1,7 +1,7 @@
-use log::*;
-use std::time::Duration;
-use std::path::Path;
 use crate::env_reader::env_var_exists;
+use log::*;
+use std::path::Path;
+use std::time::Duration;
 
 pub mod env_reader;
 pub mod sleeper;
@@ -122,22 +122,13 @@ pub fn config_from_env() -> Config {
     Config {
         hosts: crate::env_reader::env_var("WAIT_HOSTS", "".to_string()),
         paths: crate::env_reader::env_var("WAIT_PATHS", "".to_string()),
-        global_timeout: to_int(
-            &legacy_or_new("WAIT_HOSTS_TIMEOUT", "WAIT_TIMEOUT", ""),
-            30,
-        ),
+        global_timeout: to_int(&legacy_or_new("WAIT_HOSTS_TIMEOUT", "WAIT_TIMEOUT", ""), 30),
         tcp_connection_timeout: to_int(
             &crate::env_reader::env_var("WAIT_HOST_CONNECT_TIMEOUT", "".to_string()),
             5,
         ),
-        wait_before: to_int(
-            &legacy_or_new("WAIT_BEFORE_HOSTS", "WAIT_BEFORE", ""),
-            0,
-        ),
-        wait_after: to_int(
-            &legacy_or_new("WAIT_AFTER_HOSTS", "WAIT_AFTER", ""),
-            0,
-        ),
+        wait_before: to_int(&legacy_or_new("WAIT_BEFORE_HOSTS", "WAIT_BEFORE", ""), 0),
+        wait_after: to_int(&legacy_or_new("WAIT_AFTER_HOSTS", "WAIT_AFTER", ""), 0),
         wait_sleep_interval: to_int(
             &crate::env_reader::env_var("WAIT_SLEEP_INTERVAL", "".to_string()),
             1,
@@ -148,7 +139,10 @@ pub fn config_from_env() -> Config {
 fn legacy_or_new(legacy_var_name: &str, var_name: &str, default: &str) -> String {
     let mut temp_value = default.to_string();
     if env_var_exists(legacy_var_name) {
-        warn!("Environment variable [{}] is deprecated. Use [{}] instead.", legacy_var_name, var_name);
+        warn!(
+            "Environment variable [{}] is deprecated. Use [{}] instead.",
+            legacy_var_name, var_name
+        );
         temp_value = crate::env_reader::env_var(legacy_var_name, temp_value);
     }
     temp_value = crate::env_reader::env_var(var_name, temp_value);
