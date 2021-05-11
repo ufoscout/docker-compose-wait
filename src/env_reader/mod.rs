@@ -7,10 +7,12 @@ pub fn env_var(key: &str, default: String) -> String {
     }
 }
 
+pub fn env_var_exists(key: &str) -> bool {
+    env::var(key).is_ok()
+}
+
 #[cfg(test)]
 mod test {
-
-    extern crate time;
 
     use super::*;
     use std::env;
@@ -30,15 +32,18 @@ mod test {
 
         println!("Result Variable [{}]: [{}]", env_key, env_value);
 
+        assert!(env_var_exists(&env_key));
         assert_ne!(env_value, String::from(""));
         assert_eq!(env_value, env_var(&env_key, String::from("")));
     }
 
     #[test]
     fn should_return_the_default_value_if_env_variable_not_present() {
-        let mut nanosec = time::get_time().nsec;
-        let env_key = nanosec.to_string();
-        nanosec = nanosec + 10;
-        assert_eq!(nanosec.to_string(), env_var(&env_key, nanosec.to_string()));
+        let mut random: i64 = rand::random();
+        let env_key = random.to_string();
+        random = random + 10;
+
+        assert!(!env_var_exists(&env_key));
+        assert_eq!(random.to_string(), env_var(&env_key, random.to_string()));
     }
 }
