@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 port_check = "0.1"
 log = "0.4"
-env_logger = { version = "0.8", default-features = false }
+env_logger = { version = "0.9", default-features = false }
 
 [dev-dependencies]
 atomic-counter = "1.0"
