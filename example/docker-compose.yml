@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: "password"
+
+  wait_postgres:
+    image: docker-compose-wait:latest
+    build: ../
+    environment:
+      WAIT_HOSTS: "postgres:5432"
