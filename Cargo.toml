@@ -1,6 +1,6 @@
 [package]
 name = "wait"
-version = "2.9.0"
+version = "2.10.0"
 authors = ["ufoscout <ufoscout@gmail.com>"]
 edition = "2018"
 
@@ -8,6 +8,8 @@ edition = "2018"
 port_check = "0.1"
 log = "0.4"
 env_logger = { version = "0.9", default-features = false }
+exec = "0.3.1"
+shell-words = "1.1.0"
 
 [dev-dependencies]
 atomic-counter = "1.0"

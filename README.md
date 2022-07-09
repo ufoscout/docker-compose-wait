@@ -23,7 +23,7 @@ For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow
 FROM alpine
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.10.0/wait /wait
 RUN chmod +x /wait
 
 ## Add your application to the docker image
@@ -77,9 +77,23 @@ command: sh -c "/wait && /MySuperApp.sh"
 
 This is discussed further [here](https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands) and [here](https://github.com/docker/compose/issues/2033).
 
-Do note the recommended way of using `wait` is with the shell operator `&&`, which implies the requirement of a shell. This introduces a requirement for Docker use where bases images like [scratch](https://hub.docker.com/_/scratch) not offering a shell cannot be used.
+## Usage in images that do not have a shell
 
-Instead the recommendation for base Docker images are ones offering a shell like [alpine](https://hub.docker.com/_/alpine), [debian](https://hub.docker.com/_/debian) etc. and if you want to aim for _minimalism_, evaluate something like: [busybox](https://hub.docker.com/_/busybox)
+When using [distroless](https://github.com/GoogleContainerTools/distroless) or building images [`FROM scratch`](https://docs.docker.com/develop/develop-images/baseimages/#create-a-simple-parent-image-using-scratch), it is common to not have `sh` available. In this case, it is necessary to [specify the command for wait to run explicitly](#additional-configuration-options). The invoked command will be invoked with any arguments configured for it and will completely replace the `wait` process in your container via a syscall to [`exec`](https://man7.org/linux/man-pages/man3/exec.3.html). Because there is no shell to expand arguments in this case, `wait` must be the `ENTRYPOINT` for the container and has to be specified in [the exec form](https://docs.docker.com/engine/reference/builder/#exec-form-entrypoint-example). Note that because there is no shell to perform expansion, arguments like `*` must be interpreted by the program that receives them.
+
+```dockerfile
+FROM golang
+RUN wget -o /wait https://github.com/ufoscout/docker-compose-wait/releases/download/2.10.0/wait
+COPY myApp /app
+WORKDIR /app
+RUN go build -o /myApp -ldflags '-s -w -extldflags -static' ./...
+
+FROM scratch
+COPY --from=0 /wait /wait
+COPY --from=0 /myApp /myApp
+ENV WAIT_COMMAND="/myApp arg1 argN..."
+ENTRYPOINT ["/wait"]
+```
 
 ## Additional configuration options
 
@@ -88,6 +102,7 @@ The behaviour of the wait utility can be configured with the following environme
 - _WAIT_LOGGER_LEVEL_ : the output logger level. Valid values are: _debug_, _info_, _error_, _off_. the default is _debug_. 
 - _WAIT_HOSTS_: comma-separated list of pairs host:port for which you want to wait.
 - _WAIT_PATHS_: comma-separated list of paths (i.e. files or directories) on the local filesystem for which you want to wait until they exist.
+- _WAIT_COMMAND_: command and arguments to run once waiting completes. The invoked command will completely replace the `wait` process. The default is none.
 - _WAIT_TIMEOUT_: max number of seconds to wait for all the hosts/paths to be available before failure. The default is 30 seconds.
 - _WAIT_HOST_CONNECT_TIMEOUT_: The timeout of a single TCP connection to a remote host before attempting a new connection. The default is 5 seconds.
 - _WAIT_BEFORE_: number of seconds to wait (sleep) before start checking for the hosts/paths availability

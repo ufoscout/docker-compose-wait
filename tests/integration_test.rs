@@ -468,6 +468,7 @@ fn new_config(
     wait::Config {
         hosts: hosts.to_string(),
         paths: paths.to_string(),
+        command: None,
         global_timeout: timeout,
         tcp_connection_timeout,
         wait_before: before,
