@@ -1,0 +1,32 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch:
+          - "x86_64"
+          - "aarch64"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install cross
+        run: cargo install cross
+      - name: Build
+        run: cargo build --release --target=${{ matrix.arch }}-unknown-linux-musl
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: wait_${{ matrix.arch }}
+          path: target/release/wait
+          retention-days: 1
+          if-no-files-found: error
