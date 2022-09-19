@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install cross
-        run: cargo install cross
+      - run: cargo install cross
+      - run: rustup target add ${{ matrix.arch }}-unknown-linux-musl
       - name: Build
         run: cargo build --release --target=${{ matrix.arch }}-unknown-linux-musl
       - name: Upload binary
