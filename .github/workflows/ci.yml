@@ -31,14 +31,10 @@ jobs:
           command: build
           args: --release --target=${{ matrix.arch }}-unknown-linux-musl
           use-cross: true
-      - name: temp
-        run: |
-          apt install -y tree
-          tree
       - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
           name: wait_${{ matrix.arch }}
-          path: target/release/wait
+          path: target/
           retention-days: 1
           if-no-files-found: error
