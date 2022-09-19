@@ -35,6 +35,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: wait_${{ matrix.arch }}
-          path: target/
+          path: target/${{ matrix.arch }}-unknown-linux-musl/release/wait
           retention-days: 1
           if-no-files-found: error
