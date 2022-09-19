@@ -25,6 +25,17 @@ jobs:
           toolchain: stable
           target: ${{ matrix.arch }}-unknown-linux-musl
           override: true
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ matrix.arch }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-${{ matrix.arch }}-
       - name: Build
         uses: actions-rs/cargo@v1
         with:
