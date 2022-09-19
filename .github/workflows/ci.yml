@@ -19,10 +19,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cargo install cross
-      - run: rustup target add ${{ matrix.arch }}-unknown-linux-musl
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          target: ${{ matrix.arch }}-unknown-linux-musl
+          override: true
       - name: Build
-        run: cargo build --release --target=${{ matrix.arch }}-unknown-linux-musl
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target=${{ matrix.arch }}-unknown-linux-musl
+          use-cross: true
       - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
