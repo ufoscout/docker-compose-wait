@@ -6,6 +6,5 @@ fn main() {
 }
 
 fn on_timeout() {
-    println!("test");
     std::process::exit(1);
 }
