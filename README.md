@@ -1,6 +1,6 @@
 # docker-compose-wait
 
-[![Build Status](https://travis-ci.org/ufoscout/docker-compose-wait.svg?branch=master)](https://travis-ci.org/ufoscout/docker-compose-wait)
+![Build Status](https://github.com/ufoscout/docker-compose-wait/actions/workflows/build_and_test.yml/badge.svg)
 [![codecov](https://codecov.io/gh/ufoscout/docker-compose-wait/branch/master/graph/badge.svg)](https://codecov.io/gh/ufoscout/docker-compose-wait)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9c2359ba5534f58a4b178191acb836a)](https://www.codacy.com/manual/edumco/docker-compose-wait?utm_source=github.com&utm_medium=referral&utm_content=edumco/docker-compose-wait&utm_campaign=Badge_Grade)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fedumco%2Fdocker-compose-wait.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fedumco%2Fdocker-compose-wait?ref=badge_shield)
