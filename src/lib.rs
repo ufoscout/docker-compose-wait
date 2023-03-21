@@ -1,8 +1,8 @@
 use env_reader::env_var_exists;
 use log::*;
+use std::option::Option;
 use std::path::Path;
 use std::time::Duration;
-use std::option::Option;
 
 pub mod env_reader;
 pub mod sleeper;
@@ -15,7 +15,7 @@ pub struct Command {
 pub struct Config {
     pub hosts: String,
     pub paths: String,
-    pub command: Option<Command>,
+    pub command: Option<(Command, String)>,
     pub global_timeout: u64,
     pub tcp_connection_timeout: u64,
     pub wait_before: u64,
@@ -25,11 +25,7 @@ pub struct Config {
 
 const LINE_SEPARATOR: &str = "--------------------------------------------------------";
 
-pub fn wait(
-    sleep: &mut dyn sleeper::Sleeper,
-    config: &Config,
-    on_timeout: &mut dyn FnMut(),
-) {
+pub fn wait(sleep: &mut dyn sleeper::Sleeper, config: &Config, on_timeout: &mut dyn FnMut()) {
     info!("{}", LINE_SEPARATOR);
     info!(" docker-compose-wait {}", env!("CARGO_PKG_VERSION"));
     info!("---------------------------");
@@ -44,12 +40,11 @@ pub fn wait(
         " - TCP connection timeout before retry: {} seconds ",
         config.tcp_connection_timeout
     );
-    if config.command.is_some() {
-        debug!(
-            " - Command to run once ready: {}",
-            env_reader::env_var("WAIT_COMMAND", "".to_string())
-        );
+
+    if let Some((_, command_string)) = &config.command {
+        debug!(" - Command to run once ready: {}", command_string);
     }
+
     debug!(
         " - Sleeping time before checking for hosts/paths availability: {} seconds",
         config.wait_before
@@ -130,20 +125,30 @@ pub fn wait(
     info!("docker-compose-wait - Everything's fine, the application can now start!");
     info!("{}", LINE_SEPARATOR);
 
-    if let Some(command) = &config.command {
-        let err = exec::Command::new(&command.program).args(&command.argv).exec();
+    if let Some((command, _)) = &config.command {
+        let err = exec::Command::new(&command.program)
+            .args(&command.argv)
+            .exec();
         panic!("{}", err);
     }
 }
 
-pub fn parse_command<S: Into<String>>(raw_cmd: S) -> Result<Option<Command>, shell_words::ParseError> {
+pub fn parse_command<S: Into<String>>(
+    raw_cmd: S,
+) -> Result<Option<(Command, String)>, shell_words::ParseError> {
     let s = raw_cmd.into();
-    let t = s.trim();
-    if t.len() == 0 {
-        return Ok(None)
+    let command_string = s.trim().to_string();
+    if command_string.len() == 0 {
+        return Ok(None);
     }
-    let argv = shell_words::split(&t)?;
-    Ok(Some(Command { program: argv[0].clone(), argv }))
+    let argv = shell_words::split(&command_string)?;
+    Ok(Some((
+        Command {
+            program: argv[0].clone(),
+            argv,
+        },
+        command_string,
+    )))
 }
 
 pub fn config_from_env() -> Config {
@@ -261,7 +266,7 @@ mod test {
 
     #[test]
     #[should_panic]
-    fn should_panic_when_given_an_invalid_command(){
+    fn should_panic_when_given_an_invalid_command() {
         let _guard = TEST_MUTEX.lock().unwrap();
         set_env("", "", "", "", "", "", "a 'b");
         config_from_env();
@@ -300,29 +305,41 @@ mod test {
 
     #[test]
     fn parse_command_handles_commands_without_args() {
-        let p = parse_command("ls".to_string()).unwrap().unwrap();
-        assert_eq!("ls", p.program);
-        assert_eq!(vec!["ls"], p.argv);
+        let (command, command_string) = parse_command("ls".to_string()).unwrap().unwrap();
+        assert_eq!("ls", command_string);
+        assert_eq!("ls", command.program);
+        assert_eq!(vec!["ls"], command.argv);
     }
 
     #[test]
     fn parse_command_handles_commands_with_args() {
-        let p = parse_command("ls -al".to_string()).unwrap().unwrap();
-        assert_eq!("ls", p.program);
-        assert_eq!(vec!["ls", "-al"], p.argv);
+        let (command, command_string) = parse_command("ls -al".to_string()).unwrap().unwrap();
+        assert_eq!("ls -al", command_string);
+        assert_eq!("ls", command.program);
+        assert_eq!(vec!["ls", "-al"], command.argv);
     }
 
     #[test]
     fn parse_command_discards_leading_and_trailing_whitespace() {
-        let p = parse_command("     hello world    ".to_string()).unwrap().unwrap();
-        assert_eq!("hello", p.program);
-        assert_eq!(vec!["hello", "world"], p.argv);
+        let (command, command_string) = parse_command("     hello world    ".to_string())
+            .unwrap()
+            .unwrap();
+        assert_eq!("hello world", command_string);
+        assert_eq!("hello", command.program);
+        assert_eq!(vec!["hello", "world"], command.argv);
     }
 
     #[test]
     fn parse_command_strips_shell_quotes() {
-        let p = parse_command(" find . -type \"f\" -name '*.rs' ".to_string()).unwrap().unwrap();
-        assert_eq!("find", p.program);
-        assert_eq!(vec!["find", ".", "-type", "f", "-name", "*.rs"], p.argv);
+        let (command, command_string) =
+            parse_command(" find . -type \"f\" -name '*.rs' ".to_string())
+                .unwrap()
+                .unwrap();
+        assert_eq!("find . -type \"f\" -name '*.rs'", command_string);
+        assert_eq!("find", command.program);
+        assert_eq!(
+            vec!["find", ".", "-type", "f", "-name", "*.rs"],
+            command.argv
+        );
     }
 }
