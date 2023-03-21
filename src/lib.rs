@@ -138,7 +138,7 @@ pub fn parse_command<S: Into<String>>(
 ) -> Result<Option<(Command, String)>, shell_words::ParseError> {
     let s = raw_cmd.into();
     let command_string = s.trim().to_string();
-    if command_string.len() == 0 {
+    if command_string.is_empty() {
         return Ok(None);
     }
     let argv = shell_words::split(&command_string)?;
@@ -281,13 +281,13 @@ mod test {
         tcp_timeout: &str,
         command: &str,
     ) {
-        env::set_var("WAIT_BEFORE_HOSTS", before.to_string());
-        env::set_var("WAIT_AFTER_HOSTS", after.to_string());
-        env::set_var("WAIT_HOSTS_TIMEOUT", timeout.to_string());
-        env::set_var("WAIT_HOST_CONNECT_TIMEOUT", tcp_timeout.to_string());
-        env::set_var("WAIT_HOSTS", hosts.to_string());
-        env::set_var("WAIT_SLEEP_INTERVAL", sleep.to_string());
-        env::set_var("WAIT_COMMAND", command.to_string());
+        env::set_var("WAIT_BEFORE_HOSTS", before);
+        env::set_var("WAIT_AFTER_HOSTS", after);
+        env::set_var("WAIT_HOSTS_TIMEOUT", timeout);
+        env::set_var("WAIT_HOST_CONNECT_TIMEOUT", tcp_timeout);
+        env::set_var("WAIT_HOSTS", hosts);
+        env::set_var("WAIT_SLEEP_INTERVAL", sleep);
+        env::set_var("WAIT_COMMAND", command);
     }
 
     #[test]
@@ -297,7 +297,7 @@ mod test {
 
     #[test]
     fn parse_command_returns_none_when_command_is_empty() {
-        for c in vec!["", " \t\n\r\n"] {
+        for c in &["", " \t\n\r\n"] {
             let p = parse_command(c.to_string()).unwrap();
             assert!(p.is_none());
         }

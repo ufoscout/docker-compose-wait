@@ -41,7 +41,7 @@ mod test {
     fn should_return_the_default_value_if_env_variable_not_present() {
         let mut random: i64 = rand::random();
         let env_key = random.to_string();
-        random = random + 10;
+        random += 10;
 
         assert!(!env_var_exists(&env_key));
         assert_eq!(random.to_string(), env_var(&env_key, random.to_string()));
