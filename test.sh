@@ -1,5 +1,7 @@
 #!/bin/bash
 
+docker build -t wait:test -f test.Dockerfile . && docker run --rm wait:test
+
 export WAIT_HOSTS=localhost:4748
 #export WAIT_PATHS=./target/one
 export WAIT_TIMEOUT=10
