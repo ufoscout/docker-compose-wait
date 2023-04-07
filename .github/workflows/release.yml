@@ -14,7 +14,7 @@ jobs:
       matrix:
         arch:
           - "x86_64"
-    #      - "aarch64"
+          - "aarch64"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,6 +30,15 @@ jobs:
           command: build
           args: --release --target=${{ matrix.arch }}-unknown-linux-musl
           use-cross: true
+      - name: Copy and prepare default artifact for release
+        run: |
+            mkdir target/artifacts
+            cp "target/x86_64-unknown-linux-musl/release/wait" "target/artifacts/wait"
+      - name: Copy and prepare all artifacts for release
+        run: |
+            cp "target/${{ matrix.arch }}-unknown-linux-musl/release/wait" "target/artifacts/wait_${{ matrix.arch }}"
+            echo "Artifacts list:"
+            ls -latr target/artifacts/*
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
