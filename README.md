@@ -3,7 +3,7 @@
 ![Build Status](https://github.com/ufoscout/docker-compose-wait/actions/workflows/build_and_test.yml/badge.svg)
 [![codecov](https://codecov.io/gh/ufoscout/docker-compose-wait/branch/master/graph/badge.svg)](https://codecov.io/gh/ufoscout/docker-compose-wait)
 
-A small command-line utility to wait for other docker images to be started while using docker-compose.
+A small command-line utility to wait for other docker images to be started while using docker-compose (or Kubernetes or docker stack or whatever).
 
 It permits waiting for:
 - a fixed amount of seconds
@@ -21,7 +21,8 @@ For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow
 FROM alpine
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.10.0/wait /wait
+## This is the default executable for the x86_64 architecture, other architectures are supported too
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.11.0/wait /wait
 RUN chmod +x /wait
 
 ## Add your application to the docker image
@@ -81,7 +82,7 @@ When using [distroless](https://github.com/GoogleContainerTools/distroless) or b
 
 ```dockerfile
 FROM golang
-RUN wget -o /wait https://github.com/ufoscout/docker-compose-wait/releases/download/2.10.0/wait
+RUN wget -o /wait https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait
 COPY myApp /app
 WORKDIR /app
 RUN go build -o /myApp -ldflags '-s -w -extldflags -static' ./...
@@ -107,16 +108,27 @@ The behaviour of the wait utility can be configured with the following environme
 - _WAIT_AFTER_: number of seconds to wait (sleep) once all the hosts/paths are available
 - _WAIT_SLEEP_INTERVAL_: number of seconds to sleep between retries. The default is 1 second.
 
+## Supported architectures
+
+From release 2.11.0, the following executables are available for download:
+- _wait_: This is the executable intended for Linux x64 systems
+- *wait_x86_64*: This is the very same executable than _wait_
+- *wait_aarch64*: This is the executable to be used for aarch64 architectures
+- *wait_arm7*: This is the executable to be used for arm7 architectures
+
+All executables are built with [MUSL](https://www.musl-libc.org/) for maximum portability.
+
+To use any of these executables, simply replace the executable name in the download link:
+https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/{{executable_name}}
+
+
 ## Using on non-linux systems
 
 The simplest way of getting the _wait_ executable is to download it from
 
 [https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait](https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait)
 
-This is a pre-built executable for Linux x64 systems which are the default ones in Docker.
-In addition, it is built with [MUSL](https://www.musl-libc.org/) for maximum portability.
-
-If you need it for a different architecture, you should clone this repository and build it for your target.
+If you need it for an architecture for which a pre-built file is not available, you should clone this repository and build it for your target.
 
 As it has no external dependencies, an being written in the mighty [rust](https://www.rust-lang.org)
 programming language, the build process is just a simple `cargo build --release`
