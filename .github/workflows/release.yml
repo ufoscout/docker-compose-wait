@@ -101,6 +101,6 @@ jobs:
           context: .
           platforms: linux/amd64, linux/arm64, linux/arm/v7
           push: true
-          tags: ${{ steps.docker-metadata.outputs.tags }}
+          tags: ${{ steps.docker-metadata.outputs.tags }},latest
           labels: ${{ steps.docker-metadata.outputs.labels }}
  
