@@ -21,7 +21,7 @@ For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow
 FROM alpine
 
 ## Add the wait script to the image
-COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest/wait /wait
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 
 ## Otherwise you can directly download the executable from github releases. E.g.:
 #  ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.11.0/wait /wait
@@ -93,7 +93,7 @@ RUN go build -o /myApp -ldflags '-s -w -extldflags -static' ./...
 
 FROM scratch
 
-COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest/wait /wait
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 
 COPY --from=0 /myApp /myApp
 ENV WAIT_COMMAND="/myApp arg1 argN..."
