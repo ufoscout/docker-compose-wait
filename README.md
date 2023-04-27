@@ -21,9 +21,11 @@ For example, your application "MySuperApp" uses MongoDB, Postgres and MySql (wow
 FROM alpine
 
 ## Add the wait script to the image
-## This is the default executable for the x86_64 architecture, other architectures are supported too
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.11.0/wait /wait
-RUN chmod +x /wait
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest/wait /wait
+
+## Otherwise you can directly download the executable from github releases. E.g.:
+#  ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.11.0/wait /wait
+#  RUN chmod +x /wait
 
 ## Add your application to the docker image
 ADD MySuperApp.sh /MySuperApp.sh
@@ -82,13 +84,17 @@ When using [distroless](https://github.com/GoogleContainerTools/distroless) or b
 
 ```dockerfile
 FROM golang
-RUN wget -o /wait https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait
+
 COPY myApp /app
 WORKDIR /app
 RUN go build -o /myApp -ldflags '-s -w -extldflags -static' ./...
 
+## ----------------
+
 FROM scratch
-COPY --from=0 /wait /wait
+
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest/wait /wait
+
 COPY --from=0 /myApp /myApp
 ENV WAIT_COMMAND="/myApp arg1 argN..."
 ENTRYPOINT ["/wait"]
@@ -108,6 +114,7 @@ The behaviour of the wait utility can be configured with the following environme
 - _WAIT_AFTER_: number of seconds to wait (sleep) once all the hosts/paths are available
 - _WAIT_SLEEP_INTERVAL_: number of seconds to sleep between retries. The default is 1 second.
 
+
 ## Supported architectures
 
 From release 2.11.0, the following executables are available for download:
@@ -122,11 +129,19 @@ To use any of these executables, simply replace the executable name in the downl
 https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/{{executable_name}}
 
 
-## Using on non-linux systems
+## Docker images
+
+Official docker images based on `scratch` can be found here:
+https://github.com/users/ufoscout/packages/container/package/docker-compose-wait
+
+
+## Using on other systems
 
 The simplest way of getting the _wait_ executable is to download it from
 
 [https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait](https://github.com/ufoscout/docker-compose-wait/releases/download/{{VERSION}}/wait)
+
+or to use one of the pre-built docker images.
 
 If you need it for an architecture for which a pre-built file is not available, you should clone this repository and build it for your target.
 
