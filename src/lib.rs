@@ -144,7 +144,7 @@ pub fn parse_command<S: Into<String>>(
     let argv = shell_words::split(&command_string)?;
     Ok(Some((
         Command {
-            program: argv[0].clone(),
+            program: argv.remove(0),
             argv,
         },
         command_string,
