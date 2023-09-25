@@ -141,7 +141,7 @@ pub fn parse_command<S: Into<String>>(
     if command_string.is_empty() {
         return Ok(None);
     }
-    let argv = shell_words::split(&command_string)?;
+    let mut argv = shell_words::split(&command_string)?;
     Ok(Some((
         Command {
             program: argv.remove(0),
