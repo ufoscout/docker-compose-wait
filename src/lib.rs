@@ -141,10 +141,10 @@ pub fn parse_command<S: Into<String>>(
     if command_string.is_empty() {
         return Ok(None);
     }
-    let argv = shell_words::split(&command_string)?;
+    let mut argv = shell_words::split(&command_string)?;
     Ok(Some((
         Command {
-            program: argv[0].clone(),
+            program: argv.remove(0),
             argv,
         },
         command_string,
@@ -308,7 +308,7 @@ mod test {
         let (command, command_string) = parse_command("ls".to_string()).unwrap().unwrap();
         assert_eq!("ls", command_string);
         assert_eq!("ls", command.program);
-        assert_eq!(vec!["ls"], command.argv);
+        assert_eq!(Vec::<String>::new(), command.argv);
     }
 
     #[test]
@@ -316,7 +316,7 @@ mod test {
         let (command, command_string) = parse_command("ls -al".to_string()).unwrap().unwrap();
         assert_eq!("ls -al", command_string);
         assert_eq!("ls", command.program);
-        assert_eq!(vec!["ls", "-al"], command.argv);
+        assert_eq!(vec!["-al"], command.argv);
     }
 
     #[test]
@@ -326,7 +326,7 @@ mod test {
             .unwrap();
         assert_eq!("hello world", command_string);
         assert_eq!("hello", command.program);
-        assert_eq!(vec!["hello", "world"], command.argv);
+        assert_eq!(vec!["world"], command.argv);
     }
 
     #[test]
@@ -337,9 +337,6 @@ mod test {
                 .unwrap();
         assert_eq!("find . -type \"f\" -name '*.rs'", command_string);
         assert_eq!("find", command.program);
-        assert_eq!(
-            vec!["find", ".", "-type", "f", "-name", "*.rs"],
-            command.argv
-        );
+        assert_eq!(vec![".", "-type", "f", "-name", "*.rs"], command.argv);
     }
 }
