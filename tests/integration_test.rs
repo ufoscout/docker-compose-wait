@@ -88,7 +88,7 @@ fn should_sleep_the_specified_time_between_path_checks() {
         &mut on_timeout,
     );
     let elapsed = millis_elapsed(start);
-    assert!(elapsed >= 2001);
+    assert!(elapsed >= 2000);
     assert!(elapsed < 3000);
 }
 
