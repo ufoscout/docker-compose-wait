@@ -27,17 +27,26 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: rustfmt
+        run: |
+          cargo fmt --all --check
 
-      - name: Build and Test
+      - name: clippy
+        run: |
+          cargo clippy --all-features --all-targets -- -D warnings
+
+      - name: Build
         run: cargo build --verbose
      
       - name: Run tests
         run: cargo test --verbose
 
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
       - name: Generate code coverage
         run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
