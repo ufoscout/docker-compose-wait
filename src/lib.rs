@@ -74,7 +74,7 @@ pub fn wait(sleep: &mut dyn sleeper::Sleeper, config: &Config, on_timeout: &mut 
         for host in config.hosts.trim().split(',') {
             info!("Checking availability of host [{}]", host);
             while !port_check::is_port_reachable_with_timeout(
-                &host.trim().to_string(),
+                host.trim(),
                 Duration::from_secs(config.tcp_connection_timeout),
             ) {
                 info!("Host [{}] not yet available...", host);
