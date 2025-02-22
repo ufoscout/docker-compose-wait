@@ -1,5 +1,5 @@
 use atomic_counter::AtomicCounter;
-use std::fs::{create_dir_all, File};
+use std::fs::{File, create_dir_all};
 use std::net::{Ipv4Addr, SocketAddrV4, TcpListener};
 use std::time::Instant;
 use std::{thread, time};
@@ -484,13 +484,15 @@ fn new_tcp_listener() -> TcpListener {
 }
 
 fn listen_async(listener: TcpListener) {
-    thread::spawn(move || loop {
-        match listener.accept() {
-            Ok(_) => {
-                println!("Connection received!");
-            }
-            Err(_) => {
-                println!("Error in received connection!");
+    thread::spawn(move || {
+        loop {
+            match listener.accept() {
+                Ok(_) => {
+                    println!("Connection received!");
+                }
+                Err(_) => {
+                    println!("Error in received connection!");
+                }
             }
         }
     });
