@@ -2,7 +2,7 @@
 name = "wait"
 version = "2.12.1"
 authors = ["ufoscout <ufoscout@gmail.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 port_check = "0.2"
