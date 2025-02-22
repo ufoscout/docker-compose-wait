@@ -231,8 +231,8 @@ fn should_wait_for_multiple_paths() {
 
     let hosts = "";
 
-    let path_1 = format!("./target/{}", rand::random::<usize>());
-    let path_2 = format!("./target/{}", rand::random::<usize>());
+    let path_1 = format!("./target/{}", rand::random::<u64>());
+    let path_2 = format!("./target/{}", rand::random::<u64>());
     let paths = path_1.clone() + "," + path_2.as_str();
 
     let start = Instant::now();
@@ -277,8 +277,8 @@ fn should_wait_for_multiple_hosts_and_paths() {
         + ","
         + &tcp_listener2.local_addr().unwrap().to_string();
 
-    let path_1 = format!("./target/{}", rand::random::<usize>());
-    let path_2 = format!("./target/{}", rand::random::<usize>());
+    let path_1 = format!("./target/{}", rand::random::<u64>());
+    let path_2 = format!("./target/{}", rand::random::<u64>());
     let paths = path_1.clone() + "," + path_2.as_str();
 
     let start = Instant::now();
@@ -359,8 +359,8 @@ fn should_fail_if_not_all_paths_are_available() {
 
     let hosts = "";
 
-    let path_1 = format!("./target/{}", rand::random::<usize>());
-    let path_2 = format!("./target/{}", rand::random::<usize>());
+    let path_1 = format!("./target/{}", rand::random::<u64>());
+    let path_2 = format!("./target/{}", rand::random::<u64>());
     let paths = path_1.clone() + "," + path_2.as_str();
 
     let start = Instant::now();

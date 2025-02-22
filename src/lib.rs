@@ -281,13 +281,20 @@ mod test {
         tcp_timeout: &str,
         command: &str,
     ) {
-        env::set_var("WAIT_BEFORE_HOSTS", before);
-        env::set_var("WAIT_AFTER_HOSTS", after);
-        env::set_var("WAIT_HOSTS_TIMEOUT", timeout);
-        env::set_var("WAIT_HOST_CONNECT_TIMEOUT", tcp_timeout);
-        env::set_var("WAIT_HOSTS", hosts);
-        env::set_var("WAIT_SLEEP_INTERVAL", sleep);
-        env::set_var("WAIT_COMMAND", command);
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var("WAIT_BEFORE_HOSTS", before) };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var("WAIT_AFTER_HOSTS", after) };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var("WAIT_HOSTS_TIMEOUT", timeout) };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var("WAIT_HOST_CONNECT_TIMEOUT", tcp_timeout) };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var("WAIT_HOSTS", hosts) };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var("WAIT_SLEEP_INTERVAL", sleep) };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var("WAIT_COMMAND", command) };
     }
 
     #[test]
